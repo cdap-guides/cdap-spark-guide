@@ -17,4 +17,4 @@
 /**
  * Package for PageRank Application of CDAP Guide.
  */
-package co.cask.cdap.guide.pagerank;
+package co.cask.cdap.guides;

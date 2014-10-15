@@ -14,11 +14,12 @@
  * the License.
  */
 
-package co.cask.cdap.guide.pagerank;
+package co.cask.cdap.guides;
 
 import co.cask.cdap.api.spark.AbstractSpark;
 import co.cask.cdap.api.spark.Spark;
 import co.cask.cdap.api.spark.SparkSpecification;
+import co.cask.cdap.guides.PageRankProgram;
 
 /**
  * Class for Spark program Specification

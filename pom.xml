@@ -25,7 +25,7 @@
   <name>PageRank Application</name>
 
   <properties>
-    <app.main.class>co.cask.cdap.guide.pagerank.PageRankApplication</app.main.class>
+    <app.main.class>co.cask.cdap.guides.PageRankApplication</app.main.class>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <cdap.version>2.5.0</cdap.version>
     <slf4j.version>1.7.5</slf4j.version>

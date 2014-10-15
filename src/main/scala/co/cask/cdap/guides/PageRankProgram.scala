@@ -14,7 +14,7 @@
  * the License.
  */
 
-package co.cask.cdap.guide.pagerank
+package co.cask.cdap.guides
 
 import co.cask.cdap.api.common.Bytes
 import co.cask.cdap.api.spark.{ScalaSparkProgram, SparkContext}

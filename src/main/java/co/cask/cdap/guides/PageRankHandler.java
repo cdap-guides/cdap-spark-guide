@@ -14,7 +14,7 @@
  * the License.
  */
 
-package co.cask.cdap.guide.pagerank;
+package co.cask.cdap.guides;
 
 import co.cask.cdap.api.annotation.UseDataSet;
 import co.cask.cdap.api.dataset.lib.ObjectStore;
