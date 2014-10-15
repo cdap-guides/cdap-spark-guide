@@ -19,7 +19,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>co.cask.cdap.guide</groupId>
-  <artifactId>PageRank</artifactId>
+  <artifactId>cdap-spark-guide</artifactId>
   <version>1.0.0</version>
   <packaging>jar</packaging>
   <name>PageRank Application</name>
