@@ -19,19 +19,17 @@ import co.cask.cdap.api.app.AbstractApplication;
 import co.cask.cdap.api.dataset.lib.ObjectStores;
 import co.cask.cdap.api.service.http.HttpServiceHandler;
 import co.cask.cdap.internal.io.UnsupportedTypeException;
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 
 /**
- * A CDAP PageRank application
+ * A CDAP PageRank application which computes the PageRank of connected URLs
  */
-public class PageRankApplication extends AbstractApplication {
+public class PageRankApp extends AbstractApplication {
 
   @Override
   public void configure() {
     setName("PageRankApplication");
-    setDescription("CDAP PageRank Application");
-    addSpark(new PageRankProgramSpec());
+    addSpark(new PageRankSpark());
     addService("PageRankService", new ImmutableList.Builder<HttpServiceHandler>()
       .add(new BackLinksHandler())
       .add(new PageRankHandler())
@@ -40,7 +38,7 @@ public class PageRankApplication extends AbstractApplication {
       ObjectStores.createObjectStore(getConfigurer(), "backLinks", String.class);
       ObjectStores.createObjectStore(getConfigurer(), "pageRanks", Double.class);
     } catch (UnsupportedTypeException e) {
-      throw Throwables.propagate(e);
+      throw new RuntimeException("Will never happen: all classes above are supported", e);
     }
   }
 }

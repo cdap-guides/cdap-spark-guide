@@ -29,7 +29,6 @@ class PageRankProgram extends ScalaSparkProgram {
   private final val ITERATIONS_COUNT: Int = 10
 
   override def run(sc: SparkContext) {
-    val iterations = getIterationCount(sc)
     val lines: RDD[(Array[Byte], String)] = sc.readFromDataset("backLinks", classOf[Array[Byte]], classOf[String])
     val links = lines.map { s =>
       val parts = BackLinksHandler.URL_DELIMITER.split(s._2)
@@ -39,7 +38,7 @@ class PageRankProgram extends ScalaSparkProgram {
     var ranks = links.mapValues(v => 1.0)
 
     // Calculate the PageRanks
-    for (i <- 1 to iterations) {
+    for (i <- 1 to ITERATIONS_COUNT) {
       val contribs = links.join(ranks).values.flatMap { case (urls, rank) =>
         val size = urls.size
         urls.map(url => (url, rank / size))
@@ -50,22 +49,5 @@ class PageRankProgram extends ScalaSparkProgram {
     val output = ranks.map(x => (Bytes.toBytes(x._1), x._2))
 
     sc.writeToDataset(output, "pageRanks", classOf[Array[Byte]], classOf[java.lang.Double])
-  }
-
-  /**
-   * Gets the iteration count if provided through arguments in CDAP else a default value [[ITERATIONS_COUNT]]
-   * @param sc: [[SparkContext]]] for this program
-   * @return the iteration count
-   */
-  private def getIterationCount(sc: SparkContext): Int = {
-    val args: Array[String] = sc.getRuntimeArguments("args")
-    var iterationCount: Int = 0
-    if (args != null && args.length > 0) {
-      iterationCount = Integer.valueOf(args(0))
-    }
-    else {
-      iterationCount = ITERATIONS_COUNT
-    }
-    iterationCount
   }
 }

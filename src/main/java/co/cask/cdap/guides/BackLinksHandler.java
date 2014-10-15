@@ -67,22 +67,9 @@ public class BackLinksHandler extends AbstractHttpServiceHandler {
   private boolean parseAndStore(String bLink) {
     String[] backlinkURLs = URL_DELIMITER.split(bLink);
     if (backlinkURLs.length == 2) {
-      backLinks.write(getIdAsByte(UUID.randomUUID()), bLink);
+      backLinks.write(bLink, bLink);
       return true;
     }
     return false;
-  }
-
-  /**
-   * Converts a {@link UUID#randomUUID()} to byte[]
-   *
-   * @param uuid the random {@link UUID}
-   * @return {@link UUID} as a byte[]
-   */
-  private byte[] getIdAsByte(UUID uuid) {
-    ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
-    bb.putLong(uuid.getMostSignificantBits());
-    bb.putLong(uuid.getLeastSignificantBits());
-    return bb.array();
   }
 }

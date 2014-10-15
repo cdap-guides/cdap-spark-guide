@@ -24,7 +24,7 @@ import co.cask.cdap.guides.PageRankProgram;
 /**
  * Class for Spark program Specification
  */
-public class PageRankProgramSpec extends AbstractSpark {
+public class PageRankSpark extends AbstractSpark {
   /**
    * Configures a {@link Spark} job by returning a
    * {@link SparkSpecification}.
