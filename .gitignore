@@ -1,10 +1,14 @@
 *.class
 .*.swp
-.beamer
+
 # Package Files #
 *.jar
 *.war
 *.ear
+
+# Build files
+target/
+dependency-reduced-pom.xml
 
 # Intellij Files & Dir #
 *.iml
@@ -16,36 +20,6 @@ out/
 ./lib/
 .idea
 
-# Gradle Files & Dir #
-build/
-.gradle/
-.stickyStorage
-.build/
-target/
-
-# Node log
-npm-*.log
-logs/
-.nux_enabled
-.nux_dashboard
-
-# Singlenode and test data files.
-/data/
-/data-fabric-tests/data/
-
-# gateway test leftover
-/gateway/data/
-/watchdog/data/
-
-# Checkstyle report
-examples/checkstyle_report.xml
-
-# Examples Stuff
-dependency-reduced-pom.xml
-
-# Hive db Stuff
-derby.log
-
-# generated json config file
-/cdap-web-app/cdap-config.json
-/cdap-web-app/cdap-security-config.json
+twitter4j.properties
+# Intermediary output by java classifier.
+localized.txt
