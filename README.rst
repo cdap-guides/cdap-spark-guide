@@ -50,10 +50,10 @@ In this guide, we assume that the backlinks data will be sent to a CDAP applicat
 Implementation
 ..............
 
-.. code:: console
-
 The first step is to construct the application structure.  We will use a standard Maven project structure for all of the source
-code files::
+code files:
+
+.. code:: console
 
   ./pom.xml
   ./src/main/java/co/cask/cdap/guides/pagerank/PageRankApp.java
@@ -62,11 +62,11 @@ code files::
   ./src/main/java/co/cask/cdap/guides/pagerank/PageRankHandler.java
   ./src/main/scala/co/cask/cdap/guides/pagerank/PageRankProgram.scala
 
-.. code:: java
-
 The application is identified by the ``PageRankApp`` class.  This class extends 
 `AbstractApplication <http://docs.cdap.io/cdap/2.5.1/en/javadocs/co/cask/cdap/api/app/AbstractApplication.html>`_,
-and overrides the ``configure()`` method to define all of the application components::
+and overrides the ``configure()`` method to define all of the application components:
+
+.. code:: java
 
   public class PageRankApp extends AbstractApplication {
   
@@ -82,7 +82,7 @@ and overrides the ``configure()`` method to define all of the application compon
         ObjectStores.createObjectStore(getConfigurer(), "backLinks", String.class);
         ObjectStores.createObjectStore(getConfigurer(), "pageRanks", Double.class);
       } catch (UnsupportedTypeException e) {
-        throw new RuntimeException("Will never happen: all above classes are supported", e);
+        throw new RuntimeException("Won't happen: all classes above are supported", e);
       }
     }
   }
@@ -91,13 +91,13 @@ and overrides the ``configure()`` method to define all of the application compon
 In this example, we’ll use Scala to write a Spark program (for example of using Java, refer to the 
 `CDAP example <http://docs.cask.co/cdap/current/en/getstarted.html#sparkpagerank-application-example>`_). 
 You’ll need to add ``scala-library`` and the ``maven-scala-plugin`` as dependencies in your maven ``pom.xml.
-Please see `pom.xml <https://github.com/cdap-guides/cdap-spark-guide/blob/develop/pom.xml>`_ as an example.
-
-.. code:: java
+Please see the `pom.xml <https://github.com/cdap-guides/cdap-spark-guide/blob/develop/pom.xml>`_ as an example.
 
 The code below configures Spark in CDAP. This class extends `AbstractSpark <http://docs.cdap.io/cdap/current/en/javadocs/co/cask/cdap/api/spark/AbstractSpark.html>`_
 and overrides the ``configure()`` method in order to define all of the components. The ``setMainClassName`` method sets the 
-Spark Program class which CDAP will run::
+Spark Program class which CDAP will run:
+
+.. code:: java
 
   public class PageRankSpark extends AbstractSpark {
 
@@ -111,14 +111,14 @@ Spark Program class which CDAP will run::
     }
   }
 
-``BackLinksHandler`` receives backlinks info via POST to /backLinks. A valid backlink information is in the form of
+``BackLinksHandler`` receives backlinks info via POST to ``/backLinks``. A valid backlink information is in the form of
 two URLs separated by whitespace. For example::
 
   http://example.com/page1 http://example.com/page10
-  
-.. code:: java
 
-``BackLinksHandler`` stores the backlink information in a Dataset as a String in the format shown above::
+``BackLinksHandler`` stores the backlink information in a Dataset as a String in the format shown above:
+
+.. code:: java
 
   public class BackLinksHandler extends AbstractHttpServiceHandler {
   
@@ -127,19 +127,22 @@ two URLs separated by whitespace. For example::
   
     @Path("backlink")
     @POST
-    public void handleBackLink(HttpServiceRequest request, HttpServiceResponder responder) {
+    public void handleBackLink(HttpServiceRequest request,
+                               HttpServiceResponder responder) {
   
       ByteBuffer requestContents = request.getContent();
   
       if (requestContents == null) {
-        responder.sendError(HttpResponseStatus.NO_CONTENT.code(), "Request content is empty.");
+        responder.sendError(HttpResponseStatus.NO_CONTENT.code(), 
+                            "Request content is empty.");
         return;
       }
   
       if (parseAndStore(Charsets.UTF_8.decode(requestContents).toString().trim())) {
         responder.sendStatus(HttpResponseStatus.OK.code());
       } else {
-        responder.sendError(HttpResponseStatus.BAD_REQUEST.code(), "Malformed backlink information");
+        responder.sendError(HttpResponseStatus.BAD_REQUEST.code(), 
+                            "Malformed backlink information");
       }
     }
   
@@ -161,7 +164,9 @@ two URLs separated by whitespace. For example::
 
 The ``PageRankProgram`` Spark program does the actual page rank computation. This code is taken from the 
 `Apache Spark's PageRank example; <https://github.com/apache/spark/blob/master/examples/src/main/scala/org/apache/spark/examples/SparkPageRank.scala>`_
-the Spark program stores the computed PageRank in a Dataset where the key is the URL and the value is the computed PageRank::
+the Spark program stores the computed PageRank in a Dataset where the key is the URL and the value is the computed PageRank:
+
+.. code:: java
 
   class PageRankProgram extends ScalaSparkProgram {
   
@@ -189,12 +194,15 @@ the Spark program stores the computed PageRank in a Dataset where the key is the
   
       val output = ranks.map(x => (Bytes.toBytes(x._1), x._2))
   
-      sc.writeToDataset(output, "pageRanks", classOf[Array[Byte]], classOf[java.lang.Double])
+      sc.writeToDataset(output, "pageRanks", classOf[Array[Byte]], 
+                        classOf[java.lang.Double])
     }
   }
 
 To serve results out via HTTP, let’s add a ``PageRankHandler``, which reads the PageRank for a given URL from 
-the ``pageRanks`` dataset::
+the ``pageRanks`` dataset:
+
+.. code:: java
 
   public class PageRankHandler extends AbstractHttpServiceHandler {
   
@@ -203,11 +211,13 @@ the ``pageRanks`` dataset::
   
     @Path("pagerank")
     @POST
-    public void handleBackLink(HttpServiceRequest request, HttpServiceResponder responder) {
+    public void handleBackLink(HttpServiceRequest request, 
+                               HttpServiceResponder responder) {
   
       ByteBuffer requestContents = request.getContent();
       if (requestContents == null) {
-        responder.sendError(HttpResponseStatus.NO_CONTENT.code(), "No URL provided.");
+        responder.sendError(HttpResponseStatus.NO_CONTENT.code(), 
+                            "No URL provided.");
         return;
       }
   
@@ -226,8 +236,6 @@ the ``pageRanks`` dataset::
 
 Build and Run
 -------------
-
-.. code:: console
 
 The ``PageRankApp`` application can be built and packaged using standard Apache Maven commands::
 
