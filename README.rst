@@ -47,11 +47,11 @@ Implementation
 The first step is to get the application structure set up.  We will use a standard Maven project structure for all of the source code files::
 
   ./pom.xml
-  ./src/main/java/co/cask/cdap/guides/pagerank/PageRankApp.java
-  ./src/main/java/co/cask/cdap/guides/pagerank/PageRankSpark.java
-  ./src/main/java/co/cask/cdap/guides/pagerank/BackLinksHandler.java
-  ./src/main/java/co/cask/cdap/guides/pagerank/PageRankHandler.java
-  ./src/main/scala/co/cask/cdap/guides/pagerank/PageRankProgram.scala
+  ./src/main/java/co/cask/cdap/guides/PageRankApp.java
+  ./src/main/java/co/cask/cdap/guides/PageRankSpark.java
+  ./src/main/java/co/cask/cdap/guides/BackLinksHandler.java
+  ./src/main/java/co/cask/cdap/guides/PageRankHandler.java
+  ./src/main/scala/co/cask/cdap/guides/PageRankProgram.scala
 
 
 The application is identified by the PageRankApp class.  This class extends 
@@ -100,7 +100,7 @@ which CDAP will run:
     }
   }
 
-BackLinksHandler receives backlinks info via POST to /backLinks. A valid backlink information is in the form of
+``BackLinksHandler`` receives backlinks info via POST to ``/backlink``. A valid backlink information is in the form of
 two URLs separated by a whitespace. For example:
 
 .. code::
