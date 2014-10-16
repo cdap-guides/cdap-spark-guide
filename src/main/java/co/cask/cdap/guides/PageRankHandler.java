@@ -29,7 +29,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
 /**
- * Handles the query to get PageRank of an URL
+ * Handles queries retrieving the PageRank of a URL.
  */
 public class PageRankHandler extends AbstractHttpServiceHandler {
 

@@ -22,7 +22,7 @@ import co.cask.cdap.internal.io.UnsupportedTypeException;
 import com.google.common.collect.ImmutableList;
 
 /**
- * A CDAP PageRank application which computes the PageRank of connected URLs
+ * A CDAP PageRank application which computes the PageRank of connected URLs.
  */
 public class PageRankApp extends AbstractApplication {
 

@@ -35,8 +35,6 @@ import javax.ws.rs.Path;
  */
 public class BackLinksHandler extends AbstractHttpServiceHandler {
 
-  static final Pattern URL_DELIMITER = Pattern.compile("\\s+");
-
   @UseDataSet("backLinks")
   private ObjectStore<String> backLinks;
 
@@ -65,7 +63,7 @@ public class BackLinksHandler extends AbstractHttpServiceHandler {
    * @return true if the backlink information is valid else false
    */
   private boolean parseAndStore(String bLink) {
-    String[] backlinkURLs = URL_DELIMITER.split(bLink);
+    String[] backlinkURLs = bLink.split("\\s+");
     if (backlinkURLs.length == 2) {
       backLinks.write(bLink, bLink);
       return true;

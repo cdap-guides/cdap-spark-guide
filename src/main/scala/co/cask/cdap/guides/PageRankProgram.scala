@@ -22,7 +22,7 @@ import org.apache.spark.SparkContext._
 import org.apache.spark.rdd.RDD
 
 /**
- * Spark program to compute PageRanks
+ * Spark program to compute PageRanks.
  */
 class PageRankProgram extends ScalaSparkProgram {
 
@@ -31,7 +31,7 @@ class PageRankProgram extends ScalaSparkProgram {
   override def run(sc: SparkContext) {
     val lines: RDD[(Array[Byte], String)] = sc.readFromDataset("backLinks", classOf[Array[Byte]], classOf[String])
     val links = lines.map { s =>
-      val parts = BackLinksHandler.URL_DELIMITER.split(s._2)
+      val parts = s._2.split("\\s+")
       (parts(0), parts(1))
     }.distinct().groupByKey().cache()
 
