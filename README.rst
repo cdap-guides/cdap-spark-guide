@@ -10,9 +10,8 @@ You will build a `CDAP application <http://docs.cdap.io/cdap/current/en/dev-guid
 
 * Build a CDAP `Spark <http://docs.cdap.io/cdap/2.5.0/en/dev-guide.html#spark-beta-standalone-cdap-only>`_ program that computes PageRank of the web pages
 * Build a `Service <http://docs.cdap.io/cdap/current/en/dev-guide.html#services>`_ to receive backlinks data and serve PageRank computation results over HTTP
-* Persist and retrieve data in `Dataset <http://docs.cdap.io/cdap/current/en/dev-guide.html#datasets>`_ and use them as input for a Spark program.
 * Use `Dataset <http://docs.cdap.io/cdap/current/en/dev-guide.html#datasets>`_ to store input data
-* Use `Dataset <http://docs.cdap.io/cdap/current/en/dev-guide.html#datasets>`_ as input and output for Spark program
+* Use Dataset as input and output for Spark program
 
 What You Will Need
 ------------------
