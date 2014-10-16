@@ -6,7 +6,7 @@ Iterative Data Processing with Apache Spark
 What You Will Build
 -------------------
 
-You will build a `CDAP application <http://docs.cdap.io/cdap/current/en/dev-guide.html#applications>`_ that exposes a REST API to take in web pages' backlinks information and serve out the `PageRank <http://en.wikipedia.org/wiki/PageRank>`_ for the known web pages. You will:
+You will build a `CDAP application <http://docs.cdap.io/cdap/current/en/dev-guide.html#applications>`_ that exposes a REST API to take in web pages’ backlinks information and serve out the `PageRank <http://en.wikipedia.org/wiki/PageRank>`_ for the known web pages. You will:
 
 * Build a CDAP `Spark <http://docs.cdap.io/cdap/2.5.0/en/dev-guide.html#spark-beta-standalone-cdap-only>`_ program that computes the PageRank of the web pages
 * Build a `Service <http://docs.cdap.io/cdap/current/en/dev-guide.html#services>`_ to receive backlinks data and serve the PageRank computation results over HTTP
@@ -25,15 +25,15 @@ Let’s Build It!
 
 The following sections will guide you through building an application from scratch. 
 If you are interested in deploying and running the application right away, you 
-can clone its source code from this GitHub repository. In that case feel 
+can clone its source code from this GitHub repository. In that case, feel 
 free to skip the next two sections and jump right to the `Build and Run`_ section.
 
 Application Design
 ~~~~~~~~~~~~~~~~~~
 
-Backlinks data is sent to the PageRankService over HTTP (e.g. by a web crawler as it processes web pages). The service persists the data into a backLinks dataset upon receiving it. The PageRank for known pages is computed periodically by a *PageRankProgram*. The program uses the backLinks dataset as an input and persists the results in the pageRanks dataset. 
+Backlinks data is sent to the *PageRankService* over HTTP (e.g. by a web crawler as it processes web pages). The service persists the data into a *backLinks* dataset upon receiving it. The PageRank for known pages is computed periodically by a *PageRankProgram*. The program uses the *backLinks* dataset as an input and persists the results in the *pageRanks* dataset. 
 
-The PageRankService then uses the pageRanks dataset to serve the PageRank for a given URL over HTTP.
+The *PageRankService* then uses the *pageRanks* dataset to serve the PageRank for a given URL over HTTP.
 
 In this guide we assume that the backlinks data will be sent to a CDAP application.
 
@@ -53,9 +53,9 @@ The first step is to construct the application structure.  We will use a standar
   ./src/main/scala/co/cask/cdap/guides/PageRankProgram.scala
 
 
-The application is identified by the PageRankApp class.  This class extends 
+The application is identified by the ``PageRankApp`` class.  This class extends 
 `AbstractApplication <http://docs.cdap.io/cdap/2.5.0/en/javadocs/co/cask/cdap/api/app/AbstractApplication.html>`_,
-and overrides the configure( ) method to define all of the application components:
+and overrides the ``configure( )`` method to define all of the application components:
 
 .. code:: java
 
@@ -82,8 +82,7 @@ and overrides the configure( ) method to define all of the application component
 In this example we’ll use Scala to write a Spark program (for example of using Java, refer to the `CDAP example <http://docs.cask.co/cdap/current/en/getstarted.html#sparkpagerank-application-example>`_). You’ll need to add ``scala`` and ``maven-scala-plugin`` as dependencies in your maven `pom.xml <https://github.com/cdap-guides/cdap-spark-guide/blob/develop/pom.xml>`_
 
 The code below configures Spark in CDAP. This class extends `AbstractSpark <http://docs.cdap.io/cdap/current/en/javadocs/co/cask/cdap/api/spark/AbstractSpark.html>`_
-and overrides the configure( ) method in order to define all of the components. The setMainClassName method sets the Spark Program class.
-which CDAP will run:
+and overrides the ``configure( )`` method in order to define all of the components. The ``setMainClassName`` method sets the Spark Program class which CDAP will run:
 
 .. code:: java
 
@@ -99,14 +98,14 @@ which CDAP will run:
     }
   }
 
-``BackLinksHandler`` receives backlinks info via POST to ``backlink``. A valid backlink information is in the form of
-two URLs separated by whitespace. For example:
+``BackLinksHandler`` receives backlinks info via POST to ``backlink``. Valid backlink information is in the form of
+two URLs separated by whitespace:
 
-.. code::
+.. code:: console
 
   http://example.com/page1 http://example.com/page10
   
-BackLinksHandler stores the backlink information in a `ObjectStore Dataset <http://docs.cask.co/cdap/current/en/javadocs/co/cask/cdap/api/dataset/lib/ObjectStore.html>`_ as a String in the format shown above:
+The ``BackLinksHandler`` stores the backlink information in a `ObjectStore Dataset <http://docs.cask.co/cdap/current/en/javadocs/co/cask/cdap/api/dataset/lib/ObjectStore.html>`_ as a String in the format shown above:
 
 .. code:: java
 
@@ -149,7 +148,7 @@ BackLinksHandler stores the backlink information in a `ObjectStore Dataset <http
     }
   }
 
-The PageRankProgram Spark program does the actual page rank computation. This code is taken from the `Apache Spark's PageRank example <https://github.com/apache/spark/blob/master/examples/src/main/scala/org/apache/spark/examples/SparkPageRank.scala>`_;
+The ``PageRankProgram`` Spark program does the actual page rank computation. This code is taken from the `Apache Spark's PageRank example <https://github.com/apache/spark/blob/master/examples/src/main/scala/org/apache/spark/examples/SparkPageRank.scala>`_;
 the Spark program stores the computed PageRank in a `ObjectStore Dataset <http://docs.cask.co/cdap/current/en/javadocs/co/cask/cdap/api/dataset/lib/ObjectStore.html>`_ where the key is the URL and the value is the computed PageRank:
 
 .. code:: java
@@ -182,7 +181,7 @@ the Spark program stores the computed PageRank in a `ObjectStore Dataset <http:/
     }
   }
 
-To serve results out via HTTP, let’s add a PageRankHandler, which reads the PageRank for a given URL from pageRanks dataset:
+To serve results out via HTTP, let’s add a ``PageRankHandler``, which reads the PageRank for a given URL from ``pageRanks`` dataset:
 
 .. code:: java
 
@@ -214,7 +213,7 @@ To serve results out via HTTP, let’s add a PageRankHandler, which reads the Pa
   }
 
 Build and Run
------------
+--------------
 
 The PageRankApp application can be built and packaged using standard Apache Maven commands::
 
@@ -266,7 +265,7 @@ Congratulations!  You have now learned how to incorporate Spark programs into yo
 Please continue to experiment and extend this sample application.
 
 Share and Discuss
----------------
+------------------
 
 Have a question? Discuss at `CDAP User Mailing List <https://groups.google.com/forum/#!forum/cdap-user>`_
 
