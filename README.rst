@@ -33,9 +33,10 @@ Application Design
 ~~~~~~~~~~~~~~~~~~
 
 Backlinks data is sent to PageRankService over HTTP (e.g. by web crawler as it processes web pages). The service persists the data into backLinks dataset upon receiving. The PageRank for known pages is computed periodically by a PageRankProgram. The program uses backLinks dataset as an input and persists results in pageRanks dataset. 
-In this guide we assume that backlinks data will be sent to CDAP application.
 
 PageRankService then uses pageRanks dataset to serve PageRank for a given URL over HTTP.
+
+In this guide we assume that backlinks data will be sent to CDAP application.
 
 
 |(AppDesign)|
