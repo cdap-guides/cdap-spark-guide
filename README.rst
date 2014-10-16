@@ -106,8 +106,6 @@ BackLinksHandler accepts receives backlinks info via POST to /backLinks:
 
   public class BackLinksHandler extends AbstractHttpServiceHandler {
   
-    static final Pattern URL_DELIMITER = Pattern.compile("\\s+");
-  
     @UseDataSet("backLinks")
     private ObjectStore<String> backLinks;
   
@@ -136,7 +134,7 @@ BackLinksHandler accepts receives backlinks info via POST to /backLinks:
      * @return true if the backlink information is valid else false
      */
     private boolean parseAndStore(String bLink) {
-      String[] backlinkURLs = URL_DELIMITER.split(bLink);
+      String[] backlinkURLs = bLink.split("\\s+");
       if (backlinkURLs.length == 2) {
         backLinks.write(bLink, bLink);
         return true;
@@ -150,18 +148,18 @@ PageRankProgram Spark program does the actual page rank computation:
 .. code:: java
 
   class PageRankProgram extends ScalaSparkProgram {
-
+  
     private final val ITERATIONS_COUNT: Int = 10
-
+  
     override def run(sc: SparkContext) {
       val lines: RDD[(Array[Byte], String)] = sc.readFromDataset("backLinks", classOf[Array[Byte]], classOf[String])
       val links = lines.map { s =>
-        val parts = BackLinksHandler.URL_DELIMITER.split(s._2)
+        val parts = s._2.split("\\s+")
         (parts(0), parts(1))
       }.distinct().groupByKey().cache()
-
+  
       var ranks = links.mapValues(v => 1.0)
-
+  
       // Calculate the PageRanks
       for (i <- 1 to ITERATIONS_COUNT) {
         val contribs = links.join(ranks).values.flatMap { case (urls, rank) =>
@@ -170,9 +168,9 @@ PageRankProgram Spark program does the actual page rank computation:
         }
         ranks = contribs.reduceByKey(_ + _).mapValues(0.15 + 0.85 * _)
       }
-
+  
       val output = ranks.map(x => (Bytes.toBytes(x._1), x._2))
-
+  
       sc.writeToDataset(output, "pageRanks", classOf[Array[Byte]], classOf[java.lang.Double])
     }
   }
