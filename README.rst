@@ -28,7 +28,7 @@ What You Will Need
 Let’s Build It!
 ---------------
 
-Following sections will guide you through building an application from scratch. 
+The following sections will guide you through building an application from scratch. 
 If you are interested in deploying and running the application right away, you 
 can clone its source code from this GitHub repository. In that case, feel 
 free to skip the next two sections and jump right to the `Build and Run`_ section.
