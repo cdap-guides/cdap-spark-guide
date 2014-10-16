@@ -1,16 +1,18 @@
 Iterative Data Processing with Apache Spark (Beta: Standalone Only)
 ====================================================================
 
-`Apache Spark <https://spark.apache.org/>`_ is very popular when it comes to in-memory cluster computing for Hadoop. In this guide, you will learn how to run Apache Spark programs with CDAP.
+`Apache Spark <https://spark.apache.org/>`_ is very popular engine to perform in-memory cluster computing for Hadoop. In this guide, you will learn how to run Apache Spark programs with CDAP.
 
 What You Will Build
 -------------------
 
-You will build a CDAP application that exposes REST API to take in web page’s backlinks information and serve out the PageRank for the known web pages. You will:
+You will build a `CDAP application <http://docs.cdap.io/cdap/current/en/dev-guide.html#applications>`_ that exposes REST API to take in web page’s backlinks information and serve out the `PageRank <http://en.wikipedia.org/wiki/PageRank>`_ for the known web pages. You will:
 
 * Build a CDAP `Spark <http://docs.cdap.io/cdap/2.5.0/en/dev-guide.html#spark-beta-standalone-cdap-only>`_ program that computes PageRank of the web pages
-* Build a `Service <http://docs.cdap.io/cdap/current/en/dev-guide.html#services>`_ to accept backlinks data and serve PageRank computation results over HTTP
+* Build a `Service <http://docs.cdap.io/cdap/current/en/dev-guide.html#services>`_ to receive backlinks data and serve PageRank computation results over HTTP
 * Persist and retrieve data in `Dataset <http://docs.cdap.io/cdap/current/en/dev-guide.html#datasets>`_ and use them as input for a Spark program.
+* Use `Dataset <http://docs.cdap.io/cdap/current/en/dev-guide.html#datasets>`_ to store input data
+* Use `Dataset <http://docs.cdap.io/cdap/current/en/dev-guide.html#datasets>`_ as input and output for Spark program
 
 What You Will Need
 ------------------
@@ -24,13 +26,14 @@ Let’s Build It!
 
 Following sections will guide you through building an application from scratch. 
 If you are interested in deploying and running the application right away, you 
-can clone its source code and binaries from this github repository. In that case feel 
+can clone its source code from this github repository. In that case feel 
 free to skip the next two sections and jump right to Build & Run section.
 
 Application Design
 ~~~~~~~~~~~~~~~~~~
 
 Backlinks data is sent to PageRankService over HTTP (e.g. by web crawler as it processes web pages). The service persists the data into backLinks dataset upon receiving. The PageRank for known pages is computed periodically by a PageRankProgram. The program uses backLinks dataset as an input and persists results in pageRanks dataset. 
+In this guide we assume that backlinks data will be sent to CDAP application.
 
 PageRankService then uses pageRanks dataset to serve PageRank for a given URL over HTTP.
 
@@ -40,10 +43,9 @@ PageRankService then uses pageRanks dataset to serve PageRank for a given URL ov
 Implementation
 ~~~~~~~~~~~~~~
 
-The first step is to get our application structure set up.  We will use a standard Maven project structure for all of the source code files::
+The first step is to get the application structure set up.  We will use a standard Maven project structure for all of the source code files::
 
   ./pom.xml
-  ./README.rst
   ./src/main/java/co/cask/cdap/guides/pagerank/PageRankApp.java
   ./src/main/java/co/cask/cdap/guides/pagerank/PageRankSpark.java
   ./src/main/java/co/cask/cdap/guides/pagerank/BackLinksHandler.java
@@ -77,13 +79,13 @@ and overrides the configure() method in order to define all of the application c
   }
 
 
-In this example we’ll use Scala to write a Spark program. You’ll need to add scala as a dependency in your maven pom.xml. Also, you will need to set property app.main.class to the name of your application class for the application jar to have proper format:
+In this example we’ll use Scala to write a Spark program (for example of using Java refer to this `CDAP example <http://docs.cask.co/cdap/current/en/getstarted.html#sparkpagerank-application-example>`_). You’ll need to add scala as a dependency in your maven pom.xml.:
 
   Please see `pom.xml <https://github.com/cdap-guides/cdap-spark-guide/blob/develop/pom.xml>`_
 
 
 The code below configures Spark in CDAP. This class extends `AbstractSpark <http://docs.cdap.io/cdap/current/en/javadocs/co/cask/cdap/api/spark/AbstractSpark.html>`_
-and overrides the configure() method in order to define all of the components. The setMainClassName here is set to Spark Program class
+and overrides the configure() method in order to define all of the components. The setMainClassName method sets Spark Program class.
 which CDAP will run:
 
 .. code:: java
@@ -100,7 +102,12 @@ which CDAP will run:
     }
   }
 
-BackLinksHandler accepts receives backlinks info via POST to /backLinks:
+BackLinksHandler receives backlinks info via POST to /backLinks. A valid backlink information is in the form of
+two URLs separated by a whitespace. For example:
+
+  http://example.com/page1 http://example.com/page10
+  
+BackLinksHandler stores the backlink information in a Dataset as a String in the format specified above.
 
 .. code:: java
 
@@ -128,7 +135,7 @@ BackLinksHandler accepts receives backlinks info via POST to /backLinks:
     }
   
     /**
-     * Parses and stores the backlink information if valid
+     * Validates the format and stores the backlink information if valid
      *
      * @param bLink the request body
      * @return true if the backlink information is valid else false
@@ -143,7 +150,8 @@ BackLinksHandler accepts receives backlinks info via POST to /backLinks:
     }
   }
 
-PageRankProgram Spark program does the actual page rank computation:
+PageRankProgram Spark program does the actual page rank computation. This code is taken from `Apache Spark's PageRank example <https://github.com/apache/spark/blob/master/examples/src/main/scala/org/apache/spark/examples/SparkPageRank.scala>`_:
+The Spark program stores the computed PageRank in a Dataset where the key is the URL and the value is the computer PageRank.
 
 .. code:: java
 
@@ -212,27 +220,28 @@ Build & Run
 The PageRankApp application can be built and packaged using standard Apache Maven commands::
 
   mvn clean package
+  
+Note that the remaining commands assume that the cdap-cli.sh script is available on your PATH. If this is not the case, please add it::
+
+  export PATH=$PATH:<CDAP home>/bin
 
 You can then deploy the application to a standalone CDAP installation::
 
-  curl -v -H "X-Archive-Name: PageRankApp" -X POST 'http://localhost:10000/v2/apps' --data-binary @target/cdap-spark-guide-1.0.0.jar
+  cdap-cli.sh deploy app target/cdap-spark-guide-1.0.0.jar
 
 Start the Service::
 
-  curl -v -X POST 'http://localhost:10000/v2/apps/PageRankApp/services/PageRankService/start'
+  cdap-cli.sh start service PageRankApp.PageRankService 
 
-Inject some Data::
+Send some Data::
 
-  curl -v -d 'http://example.com/page1 http://example.com/page1' -X POST 'http://localhost:10000/v2/apps/PageRankApp/services/PageRankService/methods/backlink'
+  export BACKLINK_URL=http://localhost:10000/v2/apps/PageRankApp/services/PageRankService/methods/backlink
 
-  curl -v -d 'http://example.com/page1 http://example.com/page10' -X POST 'http://localhost:10000/v2/apps/PageRankApp/services/PageRankService/methods/backlink'
-
-  curl -v -d 'http://example.com/page10 http://example.com/page10' -X POST 'http://localhost:10000/v2/apps/PageRankApp/services/PageRankService/methods/backlink'
-
-  curl -v -d 'http://example.com/page10 http://example.com/page100' -X POST 'http://localhost:10000/v2/apps/PageRankApp/services/PageRankService/methods/backlink'
-
-  curl -v -d 'http://example.com/page100 http://example.com/page100' -X POST 'http://localhost:10000/v2/apps/PageRankApp/services/PageRankService/methods/backlink'
-
+  curl -v -X POST -d 'http://example.com/page1 http://example.com/page1' $BACKLINK_URL  
+  curl -v -X POST -d 'http://example.com/page1 http://example.com/page10' $BACKLINK_URL  
+  curl -v -X POST -d 'http://example.com/page10 http://example.com/page10' $BACKLINK_URL  
+  curl -v -X POST -d 'http://example.com/page10 http://example.com/page100' $BACKLINK_URL  
+  curl -v -X POST -d 'http://example.com/page100 http://example.com/page100' $BACKLINK_URL
 
 Run Spark Program::
 
@@ -246,17 +255,12 @@ Query for PageRank results::
 
   curl -v -d 'http://example.com/page10' -X POST 'http://localhost:10000/v2/apps/PageRankApp/services/PageRankService/methods/pagerank'
 
-
 Example output::
 
-  0.46
+  0.45521228811700043
 
 Congratulations!  You have now learned how to incorporate Spark data into your CDAP applications.  
 Please continue to experiment and extend this sample application.
-
-Extend This Example
--------------------
-
 
 Share & Discuss
 ---------------
