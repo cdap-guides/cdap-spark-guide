@@ -79,7 +79,7 @@ and overrides the ``configure( )`` method to define all of the application compo
   }
 
 
-In this example we’ll use Scala to write a Spark program (for example of using Java, refer to the `CDAP example <http://docs.cask.co/cdap/current/en/getstarted.html#sparkpagerank-application-example>`_). You’ll need to add ``scala`` and ``maven-scala-plugin`` as dependencies in your maven `pom.xml <https://github.com/cdap-guides/cdap-spark-guide/blob/develop/pom.xml>`_
+In this example we’ll use Scala to write a Spark program (for an example of using Java, refer to the `CDAP SparkPageRank example <http://docs.cask.co/cdap/current/en/getstarted.html#sparkpagerank-application-example>`_). You’ll need to add ``scala`` and ``maven-scala-plugin`` as dependencies in your maven `pom.xml <https://github.com/cdap-guides/cdap-spark-guide/blob/develop/pom.xml>`_
 
 The code below configures Spark in CDAP. This class extends `AbstractSpark <http://docs.cdap.io/cdap/current/en/javadocs/co/cask/cdap/api/spark/AbstractSpark.html>`_
 and overrides the ``configure( )`` method in order to define all of the components. The ``setMainClassName`` method sets the Spark Program class which CDAP will run:
