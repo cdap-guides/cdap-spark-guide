@@ -79,10 +79,7 @@ and overrides the configure() method in order to define all of the application c
   }
 
 
-In this example we’ll use Scala to write a Spark program (for example of using Java refer to this `CDAP example <http://docs.cask.co/cdap/current/en/getstarted.html#sparkpagerank-application-example>`_). You’ll need to add scala and maven-scala-plugin as a dependency in your maven pom.xml.:
-
-  Please see `pom.xml <https://github.com/cdap-guides/cdap-spark-guide/blob/develop/pom.xml>`_
-
+In this example we’ll use Scala to write a Spark program (for example of using Java refer to this `CDAP example <http://docs.cask.co/cdap/current/en/getstarted.html#sparkpagerank-application-example>`_). You’ll need to add scala and maven-scala-plugin as a dependency in your maven `pom.xml <https://github.com/cdap-guides/cdap-spark-guide/blob/develop/pom.xml>`_
 
 The code below configures Spark in CDAP. This class extends `AbstractSpark <http://docs.cdap.io/cdap/current/en/javadocs/co/cask/cdap/api/spark/AbstractSpark.html>`_
 and overrides the configure() method in order to define all of the components. The setMainClassName method sets Spark Program class.
@@ -104,6 +101,8 @@ which CDAP will run:
 
 BackLinksHandler receives backlinks info via POST to /backLinks. A valid backlink information is in the form of
 two URLs separated by a whitespace. For example:
+
+.. code::
 
   http://example.com/page1 http://example.com/page10
   
