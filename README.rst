@@ -80,7 +80,7 @@ and overrides the configure() method in order to define all of the application c
   }
 
 
-In this example we’ll use Scala to write a Spark program (for example of using Java refer to this `CDAP example <http://docs.cask.co/cdap/current/en/getstarted.html#sparkpagerank-application-example>`_). You’ll need to add scala as a dependency in your maven pom.xml.:
+In this example we’ll use Scala to write a Spark program (for example of using Java refer to this `CDAP example <http://docs.cask.co/cdap/current/en/getstarted.html#sparkpagerank-application-example>`_). You’ll need to add scala and maven-scala-plugin as a dependency in your maven pom.xml.:
 
   Please see `pom.xml <https://github.com/cdap-guides/cdap-spark-guide/blob/develop/pom.xml>`_
 
