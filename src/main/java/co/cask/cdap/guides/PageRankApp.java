@@ -28,7 +28,7 @@ public class PageRankApp extends AbstractApplication {
 
   @Override
   public void configure() {
-    setName("PageRankApplication");
+    setName("PageRankApp");
     addSpark(new PageRankSpark());
     addService("PageRankService", new ImmutableList.Builder<HttpServiceHandler>()
       .add(new BackLinksHandler())
