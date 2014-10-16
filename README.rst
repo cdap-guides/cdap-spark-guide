@@ -267,7 +267,7 @@ Please continue to experiment and extend this sample application.
 Share and Discuss
 ------------------
 
-Have a question? Discuss at `CDAP User Mailing List <https://groups.google.com/forum/#!forum/cdap-user>`_
+Have a question? Discuss at the `CDAP User Mailing List <https://groups.google.com/forum/#!forum/cdap-user>`_
 
 
 .. |(AppDesign)| image:: docs/img/app-design.png
