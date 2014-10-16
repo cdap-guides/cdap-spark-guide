@@ -79,7 +79,7 @@ and overrides the configure() method in order to define all of the application c
 
 In this example we’ll use Scala to write a Spark program. You’ll need to add scala as a dependency in your maven pom.xml. Also, you will need to set property app.main.class to the name of your application class for the application jar to have proper format:
 
-  Please see `pom.xml <http://google.com/>`_
+  Please see `pom.xml <https://github.com/cdap-guides/cdap-spark-guide/blob/develop/pom.xml>`_
 
 
 The code below configures Spark in CDAP. This class extends `AbstractSpark <http://docs.cdap.io/cdap/current/en/javadocs/co/cask/cdap/api/spark/AbstractSpark.html>`_
