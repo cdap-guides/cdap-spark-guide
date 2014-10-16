@@ -107,7 +107,7 @@ two URLs separated by a whitespace. For example:
 
   http://example.com/page1 http://example.com/page10
   
-BackLinksHandler stores the backlink information in a Dataset as a String in the format specified above.
+BackLinksHandler stores the backlink information in a `ObjectStore Dataset <http://docs.cask.co/cdap/current/en/javadocs/co/cask/cdap/api/dataset/lib/ObjectStore.html>`_ as a String in the format specified above.
 
 .. code:: java
 
@@ -151,7 +151,7 @@ BackLinksHandler stores the backlink information in a Dataset as a String in the
   }
 
 PageRankProgram Spark program does the actual page rank computation. This code is taken from `Apache Spark's PageRank example <https://github.com/apache/spark/blob/master/examples/src/main/scala/org/apache/spark/examples/SparkPageRank.scala>`_:
-The Spark program stores the computed PageRank in a Dataset where the key is the URL and the value is the computer PageRank.
+The Spark program stores the computed PageRank in a `ObjectStore Dataset <http://docs.cask.co/cdap/current/en/javadocs/co/cask/cdap/api/dataset/lib/ObjectStore.html>`_ where the key is the URL and the value is the computed PageRank.
 
 .. code:: java
 
