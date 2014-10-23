@@ -1,5 +1,6 @@
+===========================================
 Iterative Data Processing with Apache Spark
-====================================================================
+===========================================
 
 `Apache Spark <https://spark.apache.org/>`_ is a very popular engine to perform in-memory cluster computing for Apache Hadoop. In this guide, you will learn how to run Apache Spark programs with CDAP.
 
