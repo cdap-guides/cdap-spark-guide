@@ -56,7 +56,7 @@ PageRank for a given URL over HTTP.
 In this guide we assume that the backlinks data will be sent to a CDAP
 application.
 
-![(AppDesign)](docs/images/app-design.png)
+![](docs/images/app-design.png)
 
 ### Implementation
 
