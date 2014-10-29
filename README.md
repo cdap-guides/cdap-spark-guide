@@ -75,7 +75,7 @@ extends
 [AbstractApplication](http://docs.cdap.io/cdap/2.5.0/en/javadocs/co/cask/cdap/api/app/AbstractApplication.html),
 and overrides the `configure( )` method to define all of the application components:
 
-``` {.sourceCode .java}
+```java
 public class PageRankApp extends AbstractApplication {
 
   @Override
@@ -108,7 +108,7 @@ The code below configures Spark in CDAP. This class extends
 and overrides the `configure( )` method to define all of the components. The
 `setMainClassName` method sets the Spark Program class which CDAP will run:
 
-``` {.sourceCode .java}
+```java
 public class PageRankSpark extends AbstractSpark {
 
   @Override
@@ -133,7 +133,7 @@ The `BackLinksHandler` stores the backlink information in an [ObjectStore
 Dataset](http://docs.cask.co/cdap/current/en/javadocs/co/cask/cdap/api/dataset/lib/ObjectStore.html)
 as a String in the format shown above:
 
-``` {.sourceCode .java}
+```java
 public class BackLinksHandler extends AbstractHttpServiceHandler {
 
   @UseDataSet("backLinks")
@@ -181,7 +181,7 @@ the Spark program stores the computed PageRank in an [ObjectStore
 Dataset](http://docs.cask.co/cdap/current/en/javadocs/co/cask/cdap/api/dataset/lib/ObjectStore.html)
 where the key is the URL and the value is the computed PageRank:
 
-``` {.sourceCode .java}
+```java
 class PageRankProgram extends ScalaSparkProgram {
 
   private final val ITERATIONS_COUNT: Int = 10
@@ -214,7 +214,7 @@ class PageRankProgram extends ScalaSparkProgram {
 To serve results out via HTTP, add a `PageRankHandler`, which
 reads the PageRank for a given URL from the `pageRanks` dataset:
 
-``` {.sourceCode .java}
+```java
 public class PageRankHandler extends AbstractHttpServiceHandler {
 
   @UseDataSet("pageRanks")
