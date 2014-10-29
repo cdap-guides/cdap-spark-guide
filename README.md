@@ -8,29 +8,29 @@ you will learn how to run Apache Spark programs with CDAP.
 What You Will Build
 -------------------
 
-You will build a [CDAP application](http://docs.cdap.io/cdap/current/en/dev-guide.html#applications)
+You will build a 
+[CDAP application](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/applications.html)
 that exposes a REST API to take in web pages’ backlinks information and
 serve out the [PageRank](http://en.wikipedia.org/wiki/PageRank) for the
 known web pages. You will:
 
--   Build a CDAP
-    [Spark](http://docs.cdap.io/cdap/2.5.0/en/dev-guide.html#spark-beta-standalone-cdap-only)
-    program that computes the PageRank of the web pages;
--   Build a
-    [Service](http://docs.cdap.io/cdap/current/en/dev-guide.html#services)
-    to receive backlinks data and serve the PageRank computation results
-    over HTTP;
--   Use a
-    [Dataset](http://docs.cdap.io/cdap/current/en/dev-guide.html#datasets)
-    to store the input data; and
--   Use a Dataset as input and output for the Spark program.
+- Build a CDAP
+  [Spark](http://docs.cdap.io/cdap/2.5.0/en/developer-guide/building-blocks/spark-jobs.html)
+  program that computes the PageRank of the web pages;
+- Build a
+  [Service](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/services.html)
+  to receive backlinks data and serve the PageRank computation results over HTTP;
+- Use a
+  [Dataset](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/datasets/index.html)
+  to store the input data; and
+- Use a Dataset as input and output for the Spark program.
 
 What You Will Need
 ------------------
 
--   [JDK 6 or JDK 7](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
--   [Apache Maven 3.0+](http://maven.apache.org/)
--   [CDAP SDK](http://docs.cdap.io/cdap/current/en/getstarted.html#download-and-setup)
+- [JDK 6 or JDK 7](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+- [Apache Maven 3.0+](http://maven.apache.org/)
+- [CDAP SDK](http://docs.cdap.io/cdap/current/en/developer-guide/getting-started/standalone/index.html)
 
 Let’s Build It!
 ---------------
@@ -72,7 +72,7 @@ standard Maven project structure for all of the source code files:
 
 The application is identified by the `PageRankApp` class. This class
 extends
-[AbstractApplication](http://docs.cdap.io/cdap/2.5.0/en/javadocs/co/cask/cdap/api/app/AbstractApplication.html),
+[AbstractApplication](http://docs.cdap.io/cdap/2.5.0/en/reference/javadocs/co/cask/cdap/api/app/AbstractApplication.html),
 and overrides the `configure( )` method to define all of the application components:
 
 ```java
@@ -100,7 +100,7 @@ In this example we’ll use Scala to write a Spark program (for an example
 of using Java, refer to the [CDAP SparkPageRank
 example](http://docs.cask.co/cdap/current/en/developer-guide/examples/spark-page-rank.html)).
 You’ll need to add `scala` and `maven-scala-plugin` as dependencies in
-your maven
+your Maven
 [pom.xml.](https://github.com/cdap-guides/cdap-spark-guide/blob/develop/pom.xml)
 
 The code below configures Spark in CDAP. This class extends
@@ -130,7 +130,7 @@ http://example.com/page1 http://example.com/page10
 ```
 
 The `BackLinksHandler` stores the backlink information in an [ObjectStore
-Dataset](http://docs.cask.co/cdap/current/en/javadocs/co/cask/cdap/api/dataset/lib/ObjectStore.html)
+Dataset](http://docs.cask.co/cdap/current/en/reference/javadocs/co/cask/cdap/api/dataset/lib/ObjectStore.html)
 as a String in the format shown above:
 
 ```java
@@ -177,9 +177,8 @@ public class BackLinksHandler extends AbstractHttpServiceHandler {
 The `PageRankProgram` Spark program does the actual page rank
 computation. This code is taken from the [Apache Spark's PageRank
 example](https://github.com/apache/spark/blob/master/examples/src/main/scala/org/apache/spark/examples/SparkPageRank.scala);
-the Spark program stores the computed PageRank in an [ObjectStore
-Dataset](http://docs.cask.co/cdap/current/en/javadocs/co/cask/cdap/api/dataset/lib/ObjectStore.html)
-where the key is the URL and the value is the computed PageRank:
+the Spark program stores the computed PageRank in an ObjectStore
+Dataset where the key is the URL and the value is the computed PageRank:
 
 ```java
 class PageRankProgram extends ScalaSparkProgram {
@@ -246,8 +245,7 @@ public class PageRankHandler extends AbstractHttpServiceHandler {
 Build and Run Application
 -------------------------
 
-The `PageRankApp` application can be built and packaged using standard
-Apache Maven commands:
+The `PageRankApp` application can be built and packaged using the Apache Maven command:
 
     mvn clean package
 
@@ -304,3 +302,19 @@ Share and Discuss!
 
 Have a question? Discuss at the [CDAP User Mailing List.](https://groups.google.com/forum/#!forum/cdap-user)
 
+License
+-------
+
+Copyright © 2014 Cask Data, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may
+not use this file except in compliance with the License. You may obtain
+a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
