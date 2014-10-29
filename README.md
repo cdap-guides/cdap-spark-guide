@@ -15,7 +15,7 @@ serve out the [PageRank](http://en.wikipedia.org/wiki/PageRank) for the
 known web pages. You will:
 
 - Build a CDAP
-  [Spark](http://docs.cdap.io/cdap/2.5.0/en/developer-guide/building-blocks/spark-jobs.html)
+  [Spark](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/spark-jobs.html)
   program that computes the PageRank of the web pages;
 - Build a
   [Service](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/services.html)
