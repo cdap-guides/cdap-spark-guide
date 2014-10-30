@@ -270,15 +270,15 @@ Send some Data:
 
     export BACKLINK_URL=http://localhost:10000/v2/apps/PageRankApp/services/PageRankService/methods/backlink
 
-    curl -v -X POST -d 'http://example.com/page1 http://example.com/page1' $BACKLINK_URL  
-    curl -v -X POST -d 'http://example.com/page1 http://example.com/page10' $BACKLINK_URL  
-    curl -v -X POST -d 'http://example.com/page10 http://example.com/page10' $BACKLINK_URL  
-    curl -v -X POST -d 'http://example.com/page10 http://example.com/page100' $BACKLINK_URL  
-    curl -v -X POST -d 'http://example.com/page100 http://example.com/page100' $BACKLINK_URL
+    curl -v -d 'http://example.com/page1 http://example.com/page1' $BACKLINK_URL  
+    curl -v -d 'http://example.com/page1 http://example.com/page10' $BACKLINK_URL  
+    curl -v -d 'http://example.com/page10 http://example.com/page10' $BACKLINK_URL  
+    curl -v -d 'http://example.com/page10 http://example.com/page100' $BACKLINK_URL  
+    curl -v -d 'http://example.com/page100 http://example.com/page100' $BACKLINK_URL
 
 Run the Spark Program:
 
-    curl -v -X POST 'http://localhost:10000/v2/apps/PageRankApp/spark/PageRankProgram/start'
+    curl -v -d 'http://localhost:10000/v2/apps/PageRankApp/spark/PageRankProgram/start'
 
 The Spark Program can take time to complete. You can check the status
 for completion using:
@@ -287,7 +287,7 @@ for completion using:
 
 Query for the PageRank results:
 
-    curl -v -d 'http://example.com/page10' -X POST 'http://localhost:10000/v2/apps/PageRankApp/services/PageRankService/methods/pagerank'
+    curl -v -d 'http://example.com/page10' 'http://localhost:10000/v2/apps/PageRankApp/services/PageRankService/methods/pagerank'
 
 Example output:
 
