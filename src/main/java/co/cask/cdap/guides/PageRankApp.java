@@ -16,6 +16,7 @@
 package co.cask.cdap.guides;
 
 import co.cask.cdap.api.app.AbstractApplication;
+import co.cask.cdap.api.data.stream.Stream;
 import co.cask.cdap.api.dataset.lib.ObjectStores;
 import co.cask.cdap.api.service.http.HttpServiceHandler;
 import co.cask.cdap.internal.io.UnsupportedTypeException;
@@ -30,12 +31,9 @@ public class PageRankApp extends AbstractApplication {
   public void configure() {
     setName("PageRankApp");
     addSpark(new PageRankSpark());
-    addService("PageRankService", new ImmutableList.Builder<HttpServiceHandler>()
-      .add(new BackLinksHandler())
-      .add(new PageRankHandler())
-      .build());
+    addStream(new Stream("backlinkURLStream"));
+    addService("PageRankService", new PageRankHandler());
     try {
-      ObjectStores.createObjectStore(getConfigurer(), "backLinks", String.class);
       ObjectStores.createObjectStore(getConfigurer(), "pageRanks", Double.class);
     } catch (UnsupportedTypeException e) {
       throw new RuntimeException("Will never happen: all classes above are supported", e);
