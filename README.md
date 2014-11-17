@@ -91,6 +91,12 @@ public class PageRankApp extends AbstractApplication {
 }
 ```
 
+`backlinkURLStream` receives backlinks information in the form of two URLs separated by whitespace:
+
+``` {.sourceCode .console}
+http://example.com/page1 http://example.com/page10
+```
+
 In this example we’ll use Scala to write a Spark program (for an example
 of using Java, refer to the [CDAP SparkPageRank
 example](http://docs.cask.co/cdap/current/en/developer-guide/examples/spark-page-rank.html)).
@@ -221,7 +227,7 @@ Send some Data:
 
 Run the Spark Program:
 
-    curl -v -d 'http://localhost:10000/v2/apps/PageRankApp/spark/PageRankProgram/start'
+    curl -v -X POST 'http://localhost:10000/v2/apps/PageRankApp/spark/PageRankProgram/start'
 
 The Spark Program can take time to complete. You can check the status
 for completion using:
