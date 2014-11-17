@@ -9,19 +9,19 @@ What You Will Build
 -------------------
 
 You will build a 
-[CDAP application](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/applications.html)
+[CDAP application](http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/applications.html)
 that exposes a REST API to take in web pages’ backlinks information and
 serve out the [PageRank](http://en.wikipedia.org/wiki/PageRank) for the
 known web pages. You will:
 
 - Build a CDAP
-  [Spark](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/spark-jobs.html)
+  [Spark](http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/spark-jobs.html)
   program that computes the PageRank of the web pages;
 - Build a
-  [Service](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/services.html)
+  [Service](http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/services.html)
   to receive backlinks data and serve the PageRank computation results over HTTP;
 - Use a
-  [Dataset](http://docs.cdap.io/cdap/current/en/developer-guide/building-blocks/datasets/index.html)
+  [Dataset](http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/datasets/index.html)
   to store the input data; and
 - Use a Dataset as input and output for the Spark program.
 
@@ -30,7 +30,7 @@ What You Will Need
 
 - [JDK 6 or JDK 7](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 - [Apache Maven 3.0+](http://maven.apache.org/)
-- [CDAP SDK](http://docs.cdap.io/cdap/current/en/developer-guide/getting-started/standalone/index.html)
+- [CDAP SDK](http://docs.cdap.io/cdap/current/en/developers-manual/getting-started/standalone/index.html)
 
 Let’s Build It!
 ---------------
@@ -70,7 +70,7 @@ standard Maven project structure for all of the source code files:
 
 The application is identified by the `PageRankApp` class. This class
 extends
-[AbstractApplication](http://docs.cdap.io/cdap/2.5.0/en/reference/javadocs/co/cask/cdap/api/app/AbstractApplication.html),
+[AbstractApplication](http://docs.cdap.io/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/app/AbstractApplication.html),
 and overrides the `configure( )` method to define all of the application components:
 
 ```java
@@ -99,13 +99,13 @@ http://example.com/page1 http://example.com/page10
 
 In this example we’ll use Scala to write a Spark program (for an example
 of using Java, refer to the [CDAP SparkPageRank
-example](http://docs.cask.co/cdap/current/en/developer-guide/examples/spark-page-rank.html)).
+example](http://docs.cask.co/cdap/current/en/developers-manual/examples/spark-page-rank.html)).
 You’ll need to add `scala` and `maven-scala-plugin` as dependencies in
 your Maven
 [pom.xml.](https://github.com/cdap-guides/cdap-spark-guide/blob/develop/pom.xml)
 
 The code below configures Spark in CDAP. This class extends
-[AbstractSpark](http://docs.cdap.io/cdap/current/en/reference/javadocs/co/cask/cdap/api/spark/AbstractSpark.html)
+[AbstractSpark](http://docs.cdap.io/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/spark/AbstractSpark.html)
 and overrides the `configure( )` method to define all of the components. The
 `setMainClassName` method sets the Spark Program class which CDAP will run:
 
