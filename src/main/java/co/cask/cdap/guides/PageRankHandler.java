@@ -24,36 +24,35 @@ import co.cask.cdap.api.service.http.HttpServiceResponder;
 import com.google.common.base.Charsets;
 
 import java.net.HttpURLConnection;
-import java.nio.ByteBuffer;
-import javax.ws.rs.POST;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 
 /**
  * Handles queries retrieving the PageRank of a URL.
  */
 public class PageRankHandler extends AbstractHttpServiceHandler {
 
-  @UseDataSet("pageRanks")
+  public static final String PAGE_RANKS_RANK_HANDLER = "pagerank";
+
+  @UseDataSet(PageRankApp.PAGE_RANK_RANKS_DATASET)
   private ObjectStore<Double> pageRanks;
 
-  @Path("pagerank")
-  @POST
-  public void handleBackLink(HttpServiceRequest request, HttpServiceResponder responder) {
-
-    ByteBuffer requestContents = request.getContent();
-    if (requestContents == null) {
-      responder.sendError(HttpURLConnection.HTTP_BAD_REQUEST, "No URL provided.");
+  @Path(PAGE_RANKS_RANK_HANDLER)
+  @GET
+  public void getRank(HttpServiceRequest request, HttpServiceResponder responder, @QueryParam("url") String url) {
+    if (url == null) {
+      responder.sendString(HttpURLConnection.HTTP_BAD_REQUEST,
+                           String.format("The url parameter must be specified"), Charsets.UTF_8);
       return;
     }
 
-    String urlParam = Charsets.UTF_8.decode(requestContents).toString();
-
-    Double rank = pageRanks.read(urlParam);
+    Double rank = pageRanks.read(url.getBytes(Charsets.UTF_8));
     if (rank == null) {
-      responder.sendError(HttpURLConnection.HTTP_BAD_REQUEST, "The following URL was not found: " + urlParam);
-      return;
+      responder.sendString(HttpURLConnection.HTTP_NO_CONTENT,
+                           String.format("No rank found of %s", url), Charsets.UTF_8);
+    } else {
+      responder.sendString(rank.toString());
     }
-
-    responder.sendJson(String.valueOf(rank));
   }
 }
