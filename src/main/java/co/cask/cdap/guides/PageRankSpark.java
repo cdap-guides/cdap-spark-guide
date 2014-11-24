@@ -25,6 +25,7 @@ import co.cask.cdap.guides.PageRankProgram;
  * Class for Spark program Specification
  */
 public class PageRankSpark extends AbstractSpark {
+
   /**
    * Configures a {@link Spark} job by returning a
    * {@link SparkSpecification}.
@@ -34,7 +35,7 @@ public class PageRankSpark extends AbstractSpark {
   @Override
   public SparkSpecification configure() {
     return SparkSpecification.Builder.with()
-      .setName("PageRankProgram")
+      .setName(PageRankSpark.class.getSimpleName())
       .setDescription("Spark program to compute PageRank")
       .setMainClassName(PageRankProgram.class.getName())
       .build();
