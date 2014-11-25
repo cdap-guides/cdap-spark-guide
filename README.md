@@ -14,16 +14,18 @@ that exposes a REST API to take in web pages’ backlinks information and
 serve out the [PageRank](http://en.wikipedia.org/wiki/PageRank) for the
 known web pages. You will:
 
+- Use a
+  [Stream](http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/streams.html)
+  as the source of backlinks data;
 - Build a CDAP
   [Spark](http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/spark-jobs.html)
-  program that computes the PageRank of the web pages;
-- Build a
-  [Service](http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/services.html)
-  to receive backlinks data and serve the PageRank computation results over HTTP;
+  program that reads directly from the Stream and computes the PageRank of the web pages;
 - Use a
   [Dataset](http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/datasets/index.html)
-  to store the input data; and
-- Use a Dataset as input and output for the Spark program.
+  to store the output of the Spark program; and
+- Build a
+  [Service](http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/services.html)
+  to serve the PageRank computation results over HTTP.
 
 What You Will Need
 ------------------
@@ -78,9 +80,9 @@ public class PageRankApp extends AbstractApplication {
 
   @Override
   public void configure() {
-    setName("PageRankApplication");
-    addSpark(new PageRankSpark());
+    setName("PageRankApp");
     addStream(new Stream("backlinkURLStream"));
+    addSpark(new PageRankSpark());
     addService("PageRankService", new PageRankHandler());
     try {
       ObjectStores.createObjectStore(getConfigurer(), "pageRanks", Double.class);
@@ -91,14 +93,15 @@ public class PageRankApp extends AbstractApplication {
 }
 ```
 
+In this example, we use a Stream to supply backlinks data;
+the Spark program that computes the PageRank of the web pages reads directly from the Stream.
 `backlinkURLStream` receives backlinks information in the form of two URLs separated by whitespace:
 
 ``` {.sourceCode .console}
 http://example.com/page1 http://example.com/page10
 ```
 
-In this example we’ll use Scala to write a Spark program (for an example
-of using Java, refer to the [CDAP SparkPageRank
+We’ll use Scala to write the Spark program (for an example of using Java, refer to the [CDAP SparkPageRank
 example](http://docs.cask.co/cdap/current/en/developers-manual/examples/spark-page-rank.html)).
 You’ll need to add `scala` and `maven-scala-plugin` as dependencies in
 your Maven
@@ -215,7 +218,7 @@ Start the Service:
 
     cdap-cli.sh start service PageRankApp.PageRankService 
 
-Send some Data:
+Send some Data to the Stream:
 
     export BACKLINK_URL=http://localhost:10000/v2/streams/backlinkURLStream
 
