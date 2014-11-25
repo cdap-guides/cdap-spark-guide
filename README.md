@@ -14,16 +14,18 @@ that exposes a REST API to take in web pages’ backlinks information and
 serve out the [PageRank](http://en.wikipedia.org/wiki/PageRank) for the
 known web pages. You will:
 
+- Use a
+  [Stream](http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/streams.html)
+  as the source of backlinks data;
 - Build a CDAP
   [Spark](http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/spark-jobs.html)
-  program that computes the PageRank of the web pages;
-- Build a
-  [Service](http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/services.html)
-  to receive backlinks data and serve the PageRank computation results over HTTP;
+  program that reads directly from the Stream and computes the PageRank of the web pages;
 - Use a
   [Dataset](http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/datasets/index.html)
-  to store the input data; and
-- Use a Dataset as input and output for the Spark program.
+  to store the output of the Spark program; and
+- Build a
+  [Service](http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/services.html)
+  to serve the PageRank computation results over HTTP.
 
 What You Will Need
 ------------------
@@ -43,11 +45,10 @@ sections and jump right to the
 
 ### Application Design
 
-Backlinks data is sent to the *PageRankService* over HTTP (e.g. by a web
-crawler as it processes web pages). The service persists the data into a
-*backLinks* dataset upon receiving it. The PageRank for known pages is
+Backlinks data is sent to the *backlinkURLStream* over HTTP (e.g. by a web
+crawler as it processes web pages). The PageRank for known pages is
 computed periodically by a *PageRankProgram*. The program uses the
-*backLinks* dataset as an input and persists the results in the
+*backlinkURLStream* as an input and persists the results in the
 *pageRanks* dataset.
 
 The *PageRankService* then uses the *pageRanks* dataset to serve the
@@ -64,7 +65,6 @@ The first step is to construct the application structure. We will use a
 standard Maven project structure for all of the source code files:
 
     ./pom.xml
-    ./src/main/java/co/cask/cdap/guides/BackLinksHandler.java
     ./src/main/java/co/cask/cdap/guides/PageRankApp.java
     ./src/main/java/co/cask/cdap/guides/PageRankSpark.java
     ./src/main/java/co/cask/cdap/guides/PageRankHandler.java
@@ -80,14 +80,11 @@ public class PageRankApp extends AbstractApplication {
 
   @Override
   public void configure() {
-    setName("PageRankApplication");
+    setName("PageRankApp");
+    addStream(new Stream("backlinkURLStream"));
     addSpark(new PageRankSpark());
-    addService("PageRankService", new ImmutableList.Builder<HttpServiceHandler>()
-      .add(new BackLinksHandler())
-      .add(new PageRankHandler())
-      .build());
+    addService("PageRankService", new PageRankHandler());
     try {
-      ObjectStores.createObjectStore(getConfigurer(), "backLinks", String.class);
       ObjectStores.createObjectStore(getConfigurer(), "pageRanks", Double.class);
     } catch (UnsupportedTypeException e) {
       throw new RuntimeException("Won't happen: all classes above are supported", e);
@@ -96,8 +93,15 @@ public class PageRankApp extends AbstractApplication {
 }
 ```
 
-In this example we’ll use Scala to write a Spark program (for an example
-of using Java, refer to the [CDAP SparkPageRank
+In this example, we use a Stream to supply backlinks data;
+the Spark program that computes the PageRank of the web pages reads directly from the Stream.
+`backlinkURLStream` receives backlinks information in the form of two URLs separated by whitespace:
+
+``` {.sourceCode .console}
+http://example.com/page1 http://example.com/page10
+```
+
+We’ll use Scala to write the Spark program (for an example of using Java, refer to the [CDAP SparkPageRank
 example](http://docs.cask.co/cdap/current/en/developers-manual/examples/spark-page-rank.html)).
 You’ll need to add `scala` and `maven-scala-plugin` as dependencies in
 your Maven
@@ -122,58 +126,6 @@ public class PageRankSpark extends AbstractSpark {
 }
 ```
 
-`BackLinksHandler` receives backlinks info via POST to `backlink`. Valid
-backlink information is in the form of two URLs separated by whitespace:
-
-``` {.sourceCode .console}
-http://example.com/page1 http://example.com/page10
-```
-
-The `BackLinksHandler` stores the backlink information in an [ObjectStore
-Dataset](http://docs.cask.co/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/dataset/lib/ObjectStore.html)
-as a String in the format shown above:
-
-```java
-public class BackLinksHandler extends AbstractHttpServiceHandler {
-
-  @UseDataSet("backLinks")
-  private ObjectStore<String> backLinks;
-
-  @Path("backlink")
-  @POST
-  public void handleBackLink(HttpServiceRequest request, HttpServiceResponder responder) {
-
-    ByteBuffer requestContents = request.getContent();
-
-    if (requestContents == null) {
-      responder.sendError(HttpResponseStatus.NO_CONTENT.code(), "Request content is empty.");
-      return;
-    }
-
-    if (parseAndStore(Charsets.UTF_8.decode(requestContents).toString().trim())) {
-      responder.sendStatus(HttpResponseStatus.OK.code());
-    } else {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST.code(), "Malformed backlink information");
-    }
-  }
-
-  /**
-   * Validates the format and stores the backlink information if valid
-   *
-   * @param bLink the request body
-   * @return true if the backlink information is valid else false
-   */
-  private boolean parseAndStore(String bLink) {
-    String[] backlinkURLs = bLink.split("\\s+");
-    if (backlinkURLs.length == 2) {
-      backLinks.write(bLink, bLink);
-      return true;
-    }
-    return false;
-  }
-}
-```
-
 The `PageRankProgram` Spark program does the actual page rank
 computation. This code is taken from the [Apache Spark's PageRank
 example](https://github.com/apache/spark/blob/master/examples/src/main/scala/org/apache/spark/examples/SparkPageRank.scala);
@@ -186,9 +138,9 @@ class PageRankProgram extends ScalaSparkProgram {
   private final val ITERATIONS_COUNT: Int = 10
 
   override def run(sc: SparkContext) {
-    val lines: RDD[(Array[Byte], String)] = sc.readFromDataset("backLinks", classOf[Array[Byte]], classOf[String])
+    val lines: RDD[(Array[Byte], Text)] = sc.readFromStream("backlinkURLStream", classOf[Text])
     val links = lines.map { s =>
-      val parts = s._2.split("\\s+")
+      val parts = s._2.toString.split("\\s+")
       (parts(0), parts(1))
     }.distinct().groupByKey().cache()
 
@@ -266,9 +218,9 @@ Start the Service:
 
     cdap-cli.sh start service PageRankApp.PageRankService 
 
-Send some Data:
+Send some Data to the Stream:
 
-    export BACKLINK_URL=http://localhost:10000/v2/apps/PageRankApp/services/PageRankService/methods/backlink
+    export BACKLINK_URL=http://localhost:10000/v2/streams/backlinkURLStream
 
     curl -v -d 'http://example.com/page1 http://example.com/page1' $BACKLINK_URL  
     curl -v -d 'http://example.com/page1 http://example.com/page10' $BACKLINK_URL  
@@ -278,7 +230,7 @@ Send some Data:
 
 Run the Spark Program:
 
-    curl -v -d 'http://localhost:10000/v2/apps/PageRankApp/spark/PageRankProgram/start'
+    curl -v -X POST 'http://localhost:10000/v2/apps/PageRankApp/spark/PageRankProgram/start'
 
 The Spark Program can take time to complete. You can check the status
 for completion using:
