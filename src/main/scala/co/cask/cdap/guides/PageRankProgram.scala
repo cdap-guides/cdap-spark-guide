@@ -18,7 +18,6 @@ package co.cask.cdap.guides
 
 import co.cask.cdap.api.common.Bytes
 import co.cask.cdap.api.spark.{ScalaSparkProgram, SparkContext}
-import org.apache.hadoop.io.Text
 import org.apache.spark.SparkContext._
 import org.apache.spark.rdd.RDD
 
@@ -30,9 +29,9 @@ class PageRankProgram extends ScalaSparkProgram {
   private final val ITERATIONS_COUNT: Int = 10
 
   override def run(sc: SparkContext) {
-    val lines: RDD[(Array[Byte], Text)] = sc.readFromStream("backlinkURLStream", classOf[Text])
+    val lines: RDD[(Array[Byte], String)] = sc.readFromDataset("backLinks", classOf[Array[Byte]], classOf[String])
     val links = lines.map { s =>
-      val parts = s._2.toString.split("\\s+")
+      val parts = s._2.split("\\s+")
       (parts(0), parts(1))
     }.distinct().groupByKey().cache()
 
