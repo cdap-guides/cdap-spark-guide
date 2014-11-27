@@ -22,11 +22,9 @@ import co.cask.cdap.api.service.http.AbstractHttpServiceHandler;
 import co.cask.cdap.api.service.http.HttpServiceRequest;
 import co.cask.cdap.api.service.http.HttpServiceResponder;
 import com.google.common.base.Charsets;
-import io.netty.handler.codec.http.HttpResponseStatus;
 
+import java.net.HttpURLConnection;
 import java.nio.ByteBuffer;
-import java.util.UUID;
-import java.util.regex.Pattern;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
@@ -45,14 +43,14 @@ public class BackLinksHandler extends AbstractHttpServiceHandler {
     ByteBuffer requestContents = request.getContent();
 
     if (requestContents == null) {
-      responder.sendError(HttpResponseStatus.NO_CONTENT.code(), "Request content is empty.");
+      responder.sendError(HttpURLConnection.HTTP_BAD_REQUEST, "Request content is empty.");
       return;
     }
 
     if (parseAndStore(Charsets.UTF_8.decode(requestContents).toString().trim())) {
-      responder.sendStatus(HttpResponseStatus.OK.code());
+      responder.sendStatus(HttpURLConnection.HTTP_OK);
     } else {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST.code(), "Malformed backlink information");
+      responder.sendError(HttpURLConnection.HTTP_BAD_REQUEST, "Malformed backlink information");
     }
   }
 
