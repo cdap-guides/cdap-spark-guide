@@ -22,8 +22,8 @@ import co.cask.cdap.api.service.http.AbstractHttpServiceHandler;
 import co.cask.cdap.api.service.http.HttpServiceRequest;
 import co.cask.cdap.api.service.http.HttpServiceResponder;
 import com.google.common.base.Charsets;
-import io.netty.handler.codec.http.HttpResponseStatus;
 
+import java.net.HttpURLConnection;
 import java.nio.ByteBuffer;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -42,7 +42,7 @@ public class PageRankHandler extends AbstractHttpServiceHandler {
 
     ByteBuffer requestContents = request.getContent();
     if (requestContents == null) {
-      responder.sendError(HttpResponseStatus.NO_CONTENT.code(), "No URL provided.");
+      responder.sendError(HttpURLConnection.HTTP_BAD_REQUEST, "No URL provided.");
       return;
     }
 
@@ -50,7 +50,7 @@ public class PageRankHandler extends AbstractHttpServiceHandler {
 
     Double rank = pageRanks.read(urlParam);
     if (rank == null) {
-      responder.sendError(HttpResponseStatus.NOT_FOUND.code(), "The following URL was not found: " + urlParam);
+      responder.sendError(HttpURLConnection.HTTP_BAD_REQUEST, "The following URL was not found: " + urlParam);
       return;
     }
 
