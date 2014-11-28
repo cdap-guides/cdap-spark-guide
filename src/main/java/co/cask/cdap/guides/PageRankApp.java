@@ -28,8 +28,8 @@ public class PageRankApp extends AbstractApplication {
   @Override
   public void configure() {
     setName("PageRankApp");
-    addSpark(new PageRankSpark());
     addStream(new Stream("backlinkURLStream"));
+    addSpark(new PageRankSpark());
     addService("PageRankService", new PageRankHandler());
     try {
       ObjectStores.createObjectStore(getConfigurer(), "pageRanks", Double.class);
