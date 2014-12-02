@@ -18,9 +18,7 @@ package co.cask.cdap.guides;
 import co.cask.cdap.api.app.AbstractApplication;
 import co.cask.cdap.api.data.stream.Stream;
 import co.cask.cdap.api.dataset.lib.ObjectStores;
-import co.cask.cdap.api.service.http.HttpServiceHandler;
 import co.cask.cdap.internal.io.UnsupportedTypeException;
-import com.google.common.collect.ImmutableList;
 
 /**
  * A CDAP PageRank application which computes the PageRank of connected URLs.
@@ -30,8 +28,8 @@ public class PageRankApp extends AbstractApplication {
   @Override
   public void configure() {
     setName("PageRankApp");
-    addSpark(new PageRankSpark());
     addStream(new Stream("backlinkURLStream"));
+    addSpark(new PageRankSpark());
     addService("PageRankService", new PageRankHandler());
     try {
       ObjectStores.createObjectStore(getConfigurer(), "pageRanks", Double.class);
