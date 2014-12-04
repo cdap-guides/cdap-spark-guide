@@ -25,18 +25,18 @@ import co.cask.cdap.internal.io.UnsupportedTypeException;
  */
 public class PageRankApp extends AbstractApplication {
 
-  public static final String PAGE_RANK_RANKS_SERVICE = "PageRankService";
-  public static final String PAGE_RANK_BACKLINK_STREAM = "backlinkURLStream";
-  public static final String PAGE_RANK_RANKS_DATASET = "pageRanks";
+  public static final String RANKS_SERVICE = "PageRankService";
+  public static final String BACKLINK_STREAM = "backlinkURLStream";
+  public static final String RANKS_DATASET = "pageRanks";
 
   @Override
   public void configure() {
     setName(PageRankApp.class.getSimpleName());
     addSpark(new PageRankSpark());
-    addStream(new Stream(PAGE_RANK_BACKLINK_STREAM));
-    addService(PAGE_RANK_RANKS_SERVICE, new PageRankHandler());
+    addStream(new Stream(BACKLINK_STREAM));
+    addService(RANKS_SERVICE, new PageRankHandler());
     try {
-      ObjectStores.createObjectStore(getConfigurer(), PAGE_RANK_RANKS_DATASET, Double.class);
+      ObjectStores.createObjectStore(getConfigurer(), RANKS_DATASET, Double.class);
     } catch (UnsupportedTypeException e) {
       throw new RuntimeException("Will never happen: all classes above are supported", e);
     }

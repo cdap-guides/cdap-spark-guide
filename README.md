@@ -217,13 +217,11 @@ Start the Service:
 
 Send some Data to the Stream:
 
-    export BACKLINK_URL=http://localhost:10000/v2/streams/backlinkURLStream
-
-    curl -v -d 'http://example.com/page1 http://example.com/page1' $BACKLINK_URL
-    curl -v -d 'http://example.com/page1 http://example.com/page10' $BACKLINK_URL
-    curl -v -d 'http://example.com/page10 http://example.com/page10' $BACKLINK_URL
-    curl -v -d 'http://example.com/page10 http://example.com/page100' $BACKLINK_URL
-    curl -v -d 'http://example.com/page100 http://example.com/page100' $BACKLINK_URL
+    cdap-cli.sh send stream backlinkURLStream 'http://example.com/page1 http://example.com/page1'
+    cdap-cli.sh send stream backlinkURLStream 'http://example.com/page1 http://example.com/page10'
+    cdap-cli.sh send stream backlinkURLStream 'http://example.com/page10 http://example.com/page10'
+    cdap-cli.sh send stream backlinkURLStream 'http://example.com/page10 http://example.com/page100'
+    cdap-cli.sh send stream backlinkURLStream 'http://example.com/page100 http://example.com/page100'
 
 Run the Spark Program:
 
@@ -236,7 +234,7 @@ for completion using:
 
 Query for the PageRank results:
 
-    curl -v 'http://localhost:10000/v2/apps/PageRankApp/services/PageRankService/methods/pagerank?url=http://example.com/page1'
+    cdap-cli.sh call service PageRankApp.PageRankService GET 'pagerank?url=http://example.com/page1'
 
 Example output:
 

@@ -25,12 +25,12 @@ import org.apache.spark.rdd.RDD
 /**
  * Spark program to compute PageRanks.
  */
-class PageRankProgram extends ScalaSparkProgram {
+class PageRankSparkProgram extends ScalaSparkProgram {
 
   private final val ITERATIONS_COUNT: Int = 10
 
   override def run(sc: SparkContext) {
-    val lines: RDD[(Array[Byte], Text)] = sc.readFromStream("backlinkURLStream", classOf[Text])
+    val lines: RDD[(Array[Byte], Text)] = sc.readFromStream(PageRankApp.BACKLINK_STREAM, classOf[Text])
     val links = lines.map { s =>
       val parts = s._2.toString.split("\\s+")
       (parts(0), parts(1))

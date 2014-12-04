@@ -19,7 +19,7 @@ package co.cask.cdap.guides;
 import co.cask.cdap.api.spark.AbstractSpark;
 import co.cask.cdap.api.spark.Spark;
 import co.cask.cdap.api.spark.SparkSpecification;
-import co.cask.cdap.guides.PageRankProgram;
+import co.cask.cdap.guides.PageRankSparkProgram;
 
 /**
  * Class for Spark program Specification
@@ -35,9 +35,9 @@ public class PageRankSpark extends AbstractSpark {
   @Override
   public SparkSpecification configure() {
     return SparkSpecification.Builder.with()
-      .setName(PageRankProgram.class.getSimpleName())
+      .setName(PageRankSparkProgram.class.getSimpleName())
       .setDescription("Spark program to compute PageRank")
-      .setMainClassName(PageRankProgram.class.getName())
+      .setMainClassName(PageRankSparkProgram.class.getName())
       .build();
   }
 }

@@ -35,7 +35,7 @@ public class PageRankHandler extends AbstractHttpServiceHandler {
 
   public static final String PAGE_RANKS_RANK_HANDLER = "pagerank";
 
-  @UseDataSet(PageRankApp.PAGE_RANK_RANKS_DATASET)
+  @UseDataSet(PageRankApp.RANKS_DATASET)
   private ObjectStore<Double> pageRanks;
 
   @Path(PAGE_RANKS_RANK_HANDLER)

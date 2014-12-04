@@ -49,7 +49,7 @@ public class PageRankAppTest extends TestBase {
     ApplicationManager appManager = deployApplication(PageRankApp.class);
 
     // Send a stream events to the Stream
-    StreamWriter streamWriter = appManager.getStreamWriter(PageRankApp.PAGE_RANK_BACKLINK_STREAM);
+    StreamWriter streamWriter = appManager.getStreamWriter(PageRankApp.BACKLINK_STREAM);
     streamWriter.send(URL_PAIR1);
     streamWriter.send(URL_PAIR2);
     streamWriter.send(URL_PAIR3);
@@ -59,10 +59,10 @@ public class PageRankAppTest extends TestBase {
 
 
     // Start the Spark Program
-    SparkManager sparkManager = appManager.startSpark(PageRankProgram.class.getSimpleName());
+    SparkManager sparkManager = appManager.startSpark(PageRankSparkProgram.class.getSimpleName());
     sparkManager.waitForFinish(60, TimeUnit.SECONDS);
 
-    ServiceManager serviceManager = appManager.startService(PageRankApp.PAGE_RANK_RANKS_SERVICE);
+    ServiceManager serviceManager = appManager.startService(PageRankApp.RANKS_SERVICE);
     // Wait service startup
     serviceStatusCheck(serviceManager, true);
 
