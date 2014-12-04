@@ -59,7 +59,7 @@ public class PageRankAppTest extends TestBase {
 
 
     // Start the Spark Program
-    SparkManager sparkManager = appManager.startSpark(PageRankSpark.class.getSimpleName());
+    SparkManager sparkManager = appManager.startSpark(PageRankProgram.class.getSimpleName());
     sparkManager.waitForFinish(60, TimeUnit.SECONDS);
 
     ServiceManager serviceManager = appManager.startService(PageRankApp.PAGE_RANK_RANKS_SERVICE);

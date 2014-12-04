@@ -8,7 +8,7 @@ you will learn how to run Apache Spark programs with CDAP.
 What You Will Build
 -------------------
 
-You will build a 
+You will build a
 [CDAP application](http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/applications.html)
 that exposes a REST API to take in web pages’ backlinks information and
 serve out the [PageRank](http://en.wikipedia.org/wiki/PageRank) for the
@@ -40,7 +40,7 @@ Let’s Build It!
 The following sections will guide you through building an application from scratch. If you
 are interested in deploying and running the application right away, you can clone its
 source code from this GitHub repository. In that case, feel free to skip the next two
-sections and jump right to the 
+sections and jump right to the
 [Build and Run Application](#build-and-run-application) section.
 
 ### Application Design
@@ -80,14 +80,14 @@ public class PageRankApp extends AbstractApplication {
 
   @Override
   public void configure() {
-    setName("PageRankApp");
-    addStream(new Stream("backlinkURLStream"));
+    setName(PageRankApp.class.getSimpleName());
     addSpark(new PageRankSpark());
-    addService("PageRankService", new PageRankHandler());
+    addStream(new Stream(PAGE_RANK_BACKLINK_STREAM));
+    addService(PAGE_RANK_RANKS_SERVICE, new PageRankHandler());
     try {
-      ObjectStores.createObjectStore(getConfigurer(), "pageRanks", Double.class);
+      ObjectStores.createObjectStore(getConfigurer(), PAGE_RANK_RANKS_DATASET, Double.class);
     } catch (UnsupportedTypeException e) {
-      throw new RuntimeException("Won't happen: all classes above are supported", e);
+      throw new RuntimeException("Will never happen: all classes above are supported", e);
     }
   }
 }
@@ -118,7 +118,7 @@ public class PageRankSpark extends AbstractSpark {
   @Override
   public SparkSpecification configure() {
     return SparkSpecification.Builder.with()
-      .setName("PageRankProgram")
+      .setName(PageRankProgram.class.getSimpleName())
       .setDescription("Spark program to compute PageRank")
       .setMainClassName(PageRankProgram.class.getName())
       .build();
@@ -172,24 +172,21 @@ public class PageRankHandler extends AbstractHttpServiceHandler {
   private ObjectStore<Double> pageRanks;
 
   @Path("pagerank")
-  @POST
-  public void handleBackLink(HttpServiceRequest request, HttpServiceResponder responder) {
-
-    ByteBuffer requestContents = request.getContent();
-    if (requestContents == null) {
-      responder.sendError(HttpResponseStatus.NO_CONTENT.code(), "No URL provided.");
+  @GET
+  public void getRank(HttpServiceRequest request, HttpServiceResponder responder, @QueryParam("url") String url) {
+    if (url == null) {
+      responder.sendString(HttpURLConnection.HTTP_BAD_REQUEST,
+                           String.format("The url parameter must be specified"), Charsets.UTF_8);
       return;
     }
 
-    String urlParam = Charsets.UTF_8.decode(requestContents).toString();
-
-    Double rank = pageRanks.read(urlParam);
+    Double rank = pageRanks.read(url.getBytes(Charsets.UTF_8));
     if (rank == null) {
-      responder.sendError(HttpResponseStatus.NOT_FOUND.code(), "The following URL was not found: " + urlParam);
-      return;
+      responder.sendString(HttpURLConnection.HTTP_NO_CONTENT,
+                           String.format("No rank found of %s", url), Charsets.UTF_8);
+    } else {
+      responder.sendString(rank.toString());
     }
-
-    responder.sendJson(String.valueOf(rank));
   }
 }
 ```
@@ -216,34 +213,34 @@ You can then deploy the application to a standalone CDAP installation:
 
 Start the Service:
 
-    cdap-cli.sh start service PageRankApp.PageRankService 
+    cdap-cli.sh start service PageRankApp.PageRankService
 
 Send some Data to the Stream:
 
     export BACKLINK_URL=http://localhost:10000/v2/streams/backlinkURLStream
 
-    curl -v -d 'http://example.com/page1 http://example.com/page1' $BACKLINK_URL  
-    curl -v -d 'http://example.com/page1 http://example.com/page10' $BACKLINK_URL  
-    curl -v -d 'http://example.com/page10 http://example.com/page10' $BACKLINK_URL  
-    curl -v -d 'http://example.com/page10 http://example.com/page100' $BACKLINK_URL  
+    curl -v -d 'http://example.com/page1 http://example.com/page1' $BACKLINK_URL
+    curl -v -d 'http://example.com/page1 http://example.com/page10' $BACKLINK_URL
+    curl -v -d 'http://example.com/page10 http://example.com/page10' $BACKLINK_URL
+    curl -v -d 'http://example.com/page10 http://example.com/page100' $BACKLINK_URL
     curl -v -d 'http://example.com/page100 http://example.com/page100' $BACKLINK_URL
 
 Run the Spark Program:
 
-    curl -v -X POST 'http://localhost:10000/v2/apps/PageRankApp/spark/PageRankProgram/start'
+    cdap-cli.sh start spark PageRankApp.PageRankProgram
 
 The Spark Program can take time to complete. You can check the status
 for completion using:
 
-    curl -v 'http://localhost:10000/v2/apps/PageRankApp/spark/PageRankProgram/status'
+    cdap-cli.sh get spark status PageRankApp.PageRankProgram
 
 Query for the PageRank results:
 
-    curl -v -d 'http://example.com/page10' 'http://localhost:10000/v2/apps/PageRankApp/services/PageRankService/methods/pagerank'
+    curl -v 'http://localhost:10000/v2/apps/PageRankApp/services/PageRankService/methods/pagerank?url=http://example.com/page1'
 
 Example output:
 
-    0.45521228811700043
+    0.2610116705534049
 
 Congratulations! You have now learned how to incorporate Spark programs
 into your CDAP applications. Please continue to experiment and extend
