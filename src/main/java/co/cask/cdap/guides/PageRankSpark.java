@@ -35,7 +35,7 @@ public class PageRankSpark extends AbstractSpark {
   @Override
   public SparkSpecification configure() {
     return SparkSpecification.Builder.with()
-      .setName(PageRankSparkProgram.class.getSimpleName())
+      .setName(PageRankSpark.class.getSimpleName())
       .setDescription("Spark program to compute PageRank")
       .setMainClassName(PageRankSparkProgram.class.getName())
       .build();

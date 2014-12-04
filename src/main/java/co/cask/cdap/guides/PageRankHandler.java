@@ -33,12 +33,12 @@ import javax.ws.rs.QueryParam;
  */
 public class PageRankHandler extends AbstractHttpServiceHandler {
 
-  public static final String PAGE_RANKS_RANK_HANDLER = "pagerank";
+  public static final String RANK_HANDLER = "pagerank";
 
   @UseDataSet(PageRankApp.RANKS_DATASET)
   private ObjectStore<Double> pageRanks;
 
-  @Path(PAGE_RANKS_RANK_HANDLER)
+  @Path(RANK_HANDLER)
   @GET
   public void getRank(HttpServiceRequest request, HttpServiceResponder responder, @QueryParam("url") String url) {
     if (url == null) {

@@ -47,7 +47,7 @@ sections and jump right to the
 
 Backlinks data is sent to the *backlinkURLStream* over HTTP (e.g. by a web
 crawler as it processes web pages). The PageRank for known pages is
-computed periodically by a *PageRankProgram*. The program uses the
+computed periodically by a *PageRankSparkProgram*. The program uses the
 *backlinkURLStream* as an input and persists the results in the
 *pageRanks* dataset.
 
@@ -68,7 +68,7 @@ standard Maven project structure for all of the source code files:
     ./src/main/java/co/cask/cdap/guides/PageRankApp.java
     ./src/main/java/co/cask/cdap/guides/PageRankSpark.java
     ./src/main/java/co/cask/cdap/guides/PageRankHandler.java
-    ./src/main/scala/co/cask/cdap/guides/PageRankProgram.scala
+    ./src/main/scala/co/cask/cdap/guides/PageRankSparkProgram.scala
 
 The application is identified by the `PageRankApp` class. This class
 extends
@@ -82,10 +82,10 @@ public class PageRankApp extends AbstractApplication {
   public void configure() {
     setName(PageRankApp.class.getSimpleName());
     addSpark(new PageRankSpark());
-    addStream(new Stream(PAGE_RANK_BACKLINK_STREAM));
-    addService(PAGE_RANK_RANKS_SERVICE, new PageRankHandler());
+    addStream(new Stream(BACKLINK_STREAM));
+    addService(RANKS_SERVICE, new PageRankHandler());
     try {
-      ObjectStores.createObjectStore(getConfigurer(), PAGE_RANK_RANKS_DATASET, Double.class);
+      ObjectStores.createObjectStore(getConfigurer(), RANKS_DATASET, Double.class);
     } catch (UnsupportedTypeException e) {
       throw new RuntimeException("Will never happen: all classes above are supported", e);
     }
@@ -118,15 +118,15 @@ public class PageRankSpark extends AbstractSpark {
   @Override
   public SparkSpecification configure() {
     return SparkSpecification.Builder.with()
-      .setName(PageRankProgram.class.getSimpleName())
+      .setName(PageRankSpark.class.getSimpleName())
       .setDescription("Spark program to compute PageRank")
-      .setMainClassName(PageRankProgram.class.getName())
+      .setMainClassName(PageRankSparkProgram.class.getName())
       .build();
   }
 }
 ```
 
-The `PageRankProgram` Spark program does the actual page rank
+The `PageRankSparkProgram` Spark program does the actual page rank
 computation. This code is taken from the [Apache Spark's PageRank
 example](https://github.com/apache/spark/blob/master/examples/src/main/scala/org/apache/spark/examples/SparkPageRank.scala);
 the Spark program stores the computed PageRank in an ObjectStore
@@ -138,7 +138,7 @@ class PageRankProgram extends ScalaSparkProgram {
   private final val ITERATIONS_COUNT: Int = 10
 
   override def run(sc: SparkContext) {
-    val lines: RDD[(Array[Byte], Text)] = sc.readFromStream("backlinkURLStream", classOf[Text])
+    val lines: RDD[(Array[Byte], Text)] = sc.readFromStream(PageRankApp.BACKLINK_STREAM, classOf[Text])
     val links = lines.map { s =>
       val parts = s._2.toString.split("\\s+")
       (parts(0), parts(1))
@@ -225,12 +225,12 @@ Send some Data to the Stream:
 
 Run the Spark Program:
 
-    cdap-cli.sh start spark PageRankApp.PageRankProgram
+    cdap-cli.sh start spark PageRankApp.PageRankSpark
 
 The Spark Program can take time to complete. You can check the status
 for completion using:
 
-    cdap-cli.sh get spark status PageRankApp.PageRankProgram
+    cdap-cli.sh get spark status PageRankApp.PageRankSpark
 
 Query for the PageRank results:
 

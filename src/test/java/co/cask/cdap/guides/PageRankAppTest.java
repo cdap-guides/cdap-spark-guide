@@ -59,14 +59,14 @@ public class PageRankAppTest extends TestBase {
 
 
     // Start the Spark Program
-    SparkManager sparkManager = appManager.startSpark(PageRankSparkProgram.class.getSimpleName());
+    SparkManager sparkManager = appManager.startSpark(PageRankSpark.class.getSimpleName());
     sparkManager.waitForFinish(60, TimeUnit.SECONDS);
 
     ServiceManager serviceManager = appManager.startService(PageRankApp.RANKS_SERVICE);
     // Wait service startup
     serviceStatusCheck(serviceManager, true);
 
-    String response = requestService(new URL(serviceManager.getServiceURL(), PageRankHandler.PAGE_RANKS_RANK_HANDLER +
+    String response = requestService(new URL(serviceManager.getServiceURL(), PageRankHandler.RANK_HANDLER +
       "?url=http://example.com/page1"));
 
     //pagerank in any case should be more than 0.0
