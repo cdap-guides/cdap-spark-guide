@@ -115,10 +115,12 @@ and overrides the `configure( )` method to define all of the components. The
 ```java
 public class PageRankSpark extends AbstractSpark {
 
+  public static final String NAME = "PageRankSpark";
+
   @Override
   public SparkSpecification configure() {
     return SparkSpecification.Builder.with()
-      .setName(PageRankSpark.class.getSimpleName())
+      .setName(NAME)
       .setDescription("Spark program to compute PageRank")
       .setMainClassName(PageRankSparkProgram.class.getName())
       .build();
