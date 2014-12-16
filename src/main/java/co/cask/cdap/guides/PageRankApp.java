@@ -31,7 +31,6 @@ public class PageRankApp extends AbstractApplication {
 
   @Override
   public void configure() {
-    setName(PageRankApp.class.getSimpleName());
     addSpark(new PageRankSpark());
     addStream(new Stream(PAGE_RANK_BACKLINK_STREAM));
     addService(PAGE_RANK_RANKS_SERVICE, new PageRankHandler());
