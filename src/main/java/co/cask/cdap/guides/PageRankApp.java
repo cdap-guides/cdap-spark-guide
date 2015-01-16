@@ -16,9 +16,9 @@
 package co.cask.cdap.guides;
 
 import co.cask.cdap.api.app.AbstractApplication;
+import co.cask.cdap.api.data.schema.UnsupportedTypeException;
 import co.cask.cdap.api.data.stream.Stream;
 import co.cask.cdap.api.dataset.lib.ObjectStores;
-import co.cask.cdap.internal.io.UnsupportedTypeException;
 
 /**
  * A CDAP PageRank application which computes the PageRank of connected URLs.
