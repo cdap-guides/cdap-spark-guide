@@ -218,30 +218,34 @@ Start the Service:
 
 Send some Data to the Stream:
 
-    export BACKLINK_URL=http://localhost:10000/v2/streams/backlinkURLStream
-
-    curl -v -d 'http://example.com/page1 http://example.com/page1' $BACKLINK_URL  
-    curl -v -d 'http://example.com/page1 http://example.com/page10' $BACKLINK_URL  
-    curl -v -d 'http://example.com/page10 http://example.com/page10' $BACKLINK_URL  
-    curl -v -d 'http://example.com/page10 http://example.com/page100' $BACKLINK_URL  
-    curl -v -d 'http://example.com/page100 http://example.com/page100' $BACKLINK_URL
+    cdap-cli.sh send stream backlinkURLStream 'http://example.com/page1 http://example.com/page1'
+    cdap-cli.sh send stream backlinkURLStream 'http://example.com/page1 http://example.com/page10'
+    cdap-cli.sh send stream backlinkURLStream 'http://example.com/page10 http://example.com/page10'
+    cdap-cli.sh send stream backlinkURLStream 'http://example.com/page10 http://example.com/page100'
+    cdap-cli.sh send stream backlinkURLStream 'http://example.com/page100 http://example.com/page100'
 
 Run the Spark Program:
 
-    curl -v -X POST 'http://localhost:10000/v2/apps/PageRankApp/spark/PageRankProgram/start'
+    cdap-cli.sh start spark PageRankApp.PageRankSpark
 
 The Spark Program can take time to complete. You can check the status
 for completion using:
 
-    curl -v 'http://localhost:10000/v2/apps/PageRankApp/spark/PageRankProgram/status'
+    cdap-cli.sh get spark status PageRankApp.PageRankSpark
 
 Query for the PageRank results:
 
-    curl -v -d 'http://example.com/page10' 'http://localhost:10000/v2/apps/PageRankApp/services/PageRankService/methods/pagerank'
+    cdap-cli.sh call service PageRankApp.PageRankService GET 'pagerank?url=http://example.com/page1'
 
 Example output:
 
-    0.45521228811700043
+    +====================================================================================+
+    | status | headers                                  | body size | body               |
+    +====================================================================================+
+    | 200    | Content-Length : 18                      | 18        | 0.2610116705534049 |
+    |        | Content-Type : text/plain; charset=utf-8 |           |                    |
+    |        | Connection : keep-alive                  |           |                    |
+    +====================================================================================+
 
 Congratulations! You have now learned how to incorporate Spark programs
 into your CDAP applications. Please continue to experiment and extend
