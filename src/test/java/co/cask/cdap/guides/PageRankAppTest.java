@@ -71,6 +71,8 @@ public class PageRankAppTest extends TestBase {
     //pagerank in any case should be more than 0.0
     Assert.assertTrue(Double.parseDouble(response) > 0.0);
 
+    serviceManager.stop();
+    serviceManager.waitForStatus(false);
     appManager.stopAll();
   }
 
