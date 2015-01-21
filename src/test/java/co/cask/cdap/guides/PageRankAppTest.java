@@ -63,8 +63,7 @@ public class PageRankAppTest extends TestBase {
     sparkManager.waitForFinish(60, TimeUnit.SECONDS);
 
     ServiceManager serviceManager = appManager.startService(PageRankApp.PAGE_RANK_RANKS_SERVICE);
-    // Wait service startup
-    serviceStatusCheck(serviceManager, true);
+    serviceManager.waitForStatus(true);
 
     String response = requestService(new URL(serviceManager.getServiceURL(), PageRankHandler.PAGE_RANKS_RANK_HANDLER +
       "?url=http://example.com/page1"));
@@ -72,6 +71,8 @@ public class PageRankAppTest extends TestBase {
     //pagerank in any case should be more than 0.0
     Assert.assertTrue(Double.parseDouble(response) > 0.0);
 
+    serviceManager.stop();
+    serviceManager.waitForStatus(false);
     appManager.stopAll();
   }
 
@@ -83,16 +84,5 @@ public class PageRankAppTest extends TestBase {
     } finally {
       conn.disconnect();
     }
-  }
-
-  private void serviceStatusCheck(ServiceManager serviceManger, boolean running) throws InterruptedException {
-    int trial = 0;
-    while (trial++ < 5) {
-      if (serviceManger.isRunning() == running) {
-        return;
-      }
-      TimeUnit.SECONDS.sleep(1);
-    }
-    throw new IllegalStateException("Service state not executed. Expected " + running);
   }
 }
