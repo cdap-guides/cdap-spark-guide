@@ -67,11 +67,11 @@ Implementation
 The first step is to construct the application structure. We will use a
 standard Maven project structure for all of the source code files::
 
-    ./pom.xml
-    ./src/main/java/co/cask/cdap/guides/PageRankApp.java
-    ./src/main/java/co/cask/cdap/guides/PageRankSpark.java
-    ./src/main/java/co/cask/cdap/guides/PageRankHandler.java
-    ./src/main/scala/co/cask/cdap/guides/PageRankProgram.scala
+  ./pom.xml
+  ./src/main/java/co/cask/cdap/guides/PageRankApp.java
+  ./src/main/java/co/cask/cdap/guides/PageRankSpark.java
+  ./src/main/java/co/cask/cdap/guides/PageRankHandler.java
+  ./src/main/scala/co/cask/cdap/guides/PageRankProgram.scala
 
 The application is identified by the ``PageRankApp`` class. This class
 extends `AbstractApplication 
@@ -200,55 +200,55 @@ Build and Run Application
 
 The ``PageRankApp`` application can be built and packaged using the Apache Maven command::
 
-    mvn clean package
+  $ mvn clean package
 
 Note that the remaining commands assume that the ``cdap-cli.sh`` script is
 available on your PATH. If this is not the case, please add it::
 
-    export PATH=$PATH:<CDAP home>/bin
+  $ export PATH=$PATH:<CDAP home>/bin
 
 If you haven't already started a standalone CDAP installation, start it with the command::
 
-    cdap.sh start
+  $ cdap.sh start
 
 You can then deploy the application to a standalone CDAP installation::
 
-    cdap-cli.sh deploy app target/cdap-spark-guide-1.0.0.jar
+  $ cdap-cli.sh deploy app target/cdap-spark-guide-<version>.jar
 
 Start the Service::
 
-    cdap-cli.sh start service PageRankApp.PageRankService 
+  $ cdap-cli.sh start service PageRankApp.PageRankService 
 
 Send some Data to the Stream::
 
-    cdap-cli.sh send stream backlinkURLStream 'http://example.com/page1 http://example.com/page1'
-    cdap-cli.sh send stream backlinkURLStream 'http://example.com/page1 http://example.com/page10'
-    cdap-cli.sh send stream backlinkURLStream 'http://example.com/page10 http://example.com/page10'
-    cdap-cli.sh send stream backlinkURLStream 'http://example.com/page10 http://example.com/page100'
-    cdap-cli.sh send stream backlinkURLStream 'http://example.com/page100 http://example.com/page100'
+  $ cdap-cli.sh send stream backlinkURLStream \'http://example.com/page1 http://example.com/page1\'
+  $ cdap-cli.sh send stream backlinkURLStream \'http://example.com/page1 http://example.com/page10\'
+  $ cdap-cli.sh send stream backlinkURLStream \'http://example.com/page10 http://example.com/page10\'
+  $ cdap-cli.sh send stream backlinkURLStream \'http://example.com/page10 http://example.com/page100\'
+  $ cdap-cli.sh send stream backlinkURLStream \'http://example.com/page100 http://example.com/page100\'
 
 Run the Spark Program::
 
-    cdap-cli.sh start spark PageRankApp.PageRankSpark
+  $ cdap-cli.sh start spark PageRankApp.PageRankSpark
 
 The Spark Program can take time to complete. You can check the status
 for completion using::
 
-    cdap-cli.sh get spark status PageRankApp.PageRankSpark
+  $ cdap-cli.sh get spark status PageRankApp.PageRankSpark
 
 Query for the PageRank results::
 
-    cdap-cli.sh call service PageRankApp.PageRankService GET 'pagerank?url=http://example.com/page1'
+  $ cdap-cli.sh call service PageRankApp.PageRankService GET 'pagerank?url=http://example.com/page1'
 
 Example output::
 
-    +====================================================================================+
-    | status | headers                                  | body size | body               |
-    +====================================================================================+
-    | 200    | Content-Length : 18                      | 18        | 0.2610116705534049 |
-    |        | Content-Type : text/plain; charset=utf-8 |           |                    |
-    |        | Connection : keep-alive                  |           |                    |
-    +====================================================================================+
+  +====================================================================================+
+  | status | headers                                  | body size | body               |
+  +====================================================================================+
+  | 200    | Content-Length : 18                      | 18        | 0.2610116705534049 |
+  |        | Content-Type : text/plain; charset=utf-8 |           |                    |
+  |        | Connection : keep-alive                  |           |                    |
+  +====================================================================================+
 
 Congratulations! You have now learned how to incorporate Spark programs
 into your CDAP applications. Please continue to experiment and extend
