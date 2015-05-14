@@ -105,7 +105,7 @@ the Spark program that computes the PageRank of the web pages reads directly fro
   http://example.com/page1 http://example.com/page10
 
 We’ll use Scala to write the Spark program (for an example of using Java, refer to the `CDAP SparkPageRank
-example <http://docs.cask.co/cdap/current/en/developers-manual/examples/spark-page-rank.html>`__).
+example <http://docs.cask.co/cdap/current/en/examples-manual/examples/spark-page-rank.html>`__).
 You’ll need to add ``scala`` and ``maven-scala-plugin`` as dependencies in
 your Maven `pom.xml 
 <https://github.com/cdap-guides/cdap-spark-guide/blob/develop/pom.xml>`__.
