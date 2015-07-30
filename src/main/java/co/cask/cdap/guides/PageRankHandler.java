@@ -22,35 +22,40 @@ import co.cask.cdap.api.service.http.AbstractHttpServiceHandler;
 import co.cask.cdap.api.service.http.HttpServiceRequest;
 import co.cask.cdap.api.service.http.HttpServiceResponder;
 import com.google.common.base.Charsets;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import java.net.HttpURLConnection;
-import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
 
 /**
  * Handles queries retrieving the PageRank of a URL.
  */
-public class PageRankHandler extends AbstractHttpServiceHandler {
 
+public final class PageRankHandler extends AbstractHttpServiceHandler {
+
+  private static final Gson GSON = new Gson();
+  public static final String URL_KEY = "url";
   public static final String PAGE_RANKS_RANK_HANDLER = "pagerank";
 
   @UseDataSet(PageRankApp.PAGE_RANK_RANKS_DATASET)
-  private ObjectStore<Double> pageRanks;
+  private ObjectStore<Double> ranks;
 
   @Path(PAGE_RANKS_RANK_HANDLER)
-  @GET
-  public void getRank(HttpServiceRequest request, HttpServiceResponder responder, @QueryParam("url") String url) {
+  @POST
+  public void getRank(HttpServiceRequest request, HttpServiceResponder responder) {
+    String url = GSON.fromJson(Charsets.UTF_8.decode(request.getContent()).toString(),
+                               JsonObject.class).get(URL_KEY).getAsString();
     if (url == null) {
-      responder.sendString(HttpURLConnection.HTTP_BAD_REQUEST,
-                           String.format("The url parameter must be specified"), Charsets.UTF_8);
+      responder.sendError(HttpURLConnection.HTTP_BAD_REQUEST, "The url must be specified with url as key in JSON.");
       return;
     }
 
-    Double rank = pageRanks.read(url.getBytes(Charsets.UTF_8));
+    // Get the rank from the ranks dataset
+    Double rank = ranks.read(url.getBytes(Charsets.UTF_8));
     if (rank == null) {
-      responder.sendString(HttpURLConnection.HTTP_NO_CONTENT,
-                           String.format("No rank found of %s", url), Charsets.UTF_8);
+      responder.sendError(HttpURLConnection.HTTP_NO_CONTENT, String.format("No rank found of %s", url));
     } else {
       responder.sendString(rank.toString());
     }

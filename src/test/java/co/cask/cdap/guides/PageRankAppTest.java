@@ -19,14 +19,14 @@ package co.cask.cdap.guides;
 import co.cask.cdap.test.ApplicationManager;
 import co.cask.cdap.test.ServiceManager;
 import co.cask.cdap.test.SparkManager;
-import co.cask.cdap.test.StreamWriter;
+import co.cask.cdap.test.StreamManager;
 import co.cask.cdap.test.TestBase;
-import com.google.common.base.Charsets;
-import com.google.common.io.ByteStreams;
+import co.cask.common.http.HttpRequest;
+import co.cask.common.http.HttpRequests;
+import co.cask.common.http.HttpResponse;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
@@ -49,40 +49,33 @@ public class PageRankAppTest extends TestBase {
     ApplicationManager appManager = deployApplication(PageRankApp.class);
 
     // Send a stream events to the Stream
-    StreamWriter streamWriter = appManager.getStreamWriter(PageRankApp.PAGE_RANK_BACKLINK_STREAM);
-    streamWriter.send(URL_PAIR1);
-    streamWriter.send(URL_PAIR2);
-    streamWriter.send(URL_PAIR3);
-    streamWriter.send(URL_PAIR4);
-    streamWriter.send(URL_PAIR5);
-    streamWriter.send(URL_PAIR6);
-
+    StreamManager streamManager = getStreamManager(PageRankApp.PAGE_RANK_BACKLINK_STREAM);
+    streamManager.send(URL_PAIR1);
+    streamManager.send(URL_PAIR2);
+    streamManager.send(URL_PAIR3);
+    streamManager.send(URL_PAIR4);
+    streamManager.send(URL_PAIR5);
+    streamManager.send(URL_PAIR6);
 
     // Start the Spark Program
-    SparkManager sparkManager = appManager.startSpark(PageRankSpark.class.getSimpleName());
+    SparkManager sparkManager = appManager.getSparkManager(PageRankSpark.class.getSimpleName()).start();
     sparkManager.waitForFinish(60, TimeUnit.SECONDS);
 
-    ServiceManager serviceManager = appManager.startService(PageRankApp.PAGE_RANK_RANKS_SERVICE);
+    ServiceManager serviceManager = appManager.getServiceManager(PageRankApp.PAGE_RANK_RANKS_SERVICE).start();
     serviceManager.waitForStatus(true);
 
-    String response = requestService(new URL(serviceManager.getServiceURL(), PageRankHandler.PAGE_RANKS_RANK_HANDLER +
-      "?url=http://example.com/page1"));
+    //Query for rank and verify it
+    URL totalHitsURL = new URL(serviceManager.getServiceURL(15, TimeUnit.SECONDS),
+                               PageRankHandler.PAGE_RANKS_RANK_HANDLER);
 
-    //pagerank in any case should be more than 0.0
-    Assert.assertTrue(Double.parseDouble(response) > 0.0);
+    HttpResponse response = HttpRequests.execute(HttpRequest.post(totalHitsURL)
+                                                   .withBody("{\"url\":\"" + "http://example.com/page1" + "\"}")
+                                                   .build());
+    Assert.assertEquals(HttpURLConnection.HTTP_OK, response.getResponseCode());
+    Assert.assertTrue(Double.parseDouble(response.getResponseBodyAsString()) > 0.0);
 
     serviceManager.stop();
     serviceManager.waitForStatus(false);
     appManager.stopAll();
-  }
-
-  private String requestService(URL url) throws IOException {
-    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-    Assert.assertEquals(HttpURLConnection.HTTP_OK, conn.getResponseCode());
-    try {
-      return new String(ByteStreams.toByteArray(conn.getInputStream()), Charsets.UTF_8);
-    } finally {
-      conn.disconnect();
-    }
   }
 }
