@@ -168,30 +168,32 @@ reads the PageRank for a given URL from the ``pageRanks`` dataset:
 
 .. code:: java
 
-  public class PageRankHandler extends AbstractHttpServiceHandler {
+  public final class PageRankHandler extends AbstractHttpServiceHandler {
 
-    @UseDataSet("pageRanks")
-    private ObjectStore<Double> pageRanks;
+    private static final Gson GSON = new Gson();
+    public static final String URL_KEY = "url";
+    public static final String PAGE_RANKS_RANK_HANDLER = "pagerank";
 
-    @Path("pagerank")
+    @UseDataSet(PageRankApp.PAGE_RANK_RANKS_DATASET)
+    private ObjectStore<Double> ranks;
+
+    @Path(PAGE_RANKS_RANK_HANDLER)
     @POST
-    public void handleBackLink(HttpServiceRequest request, HttpServiceResponder responder) {
-
-      ByteBuffer requestContents = request.getContent();
-      if (requestContents == null) {
-        responder.sendError(HttpResponseStatus.NO_CONTENT.code(), "No URL provided.");
+    public void getRank(HttpServiceRequest request, HttpServiceResponder responder) {
+      String url = GSON.fromJson(Charsets.UTF_8.decode(request.getContent()).toString(),
+                                 JsonObject.class).get(URL_KEY).getAsString();
+      if (url == null) {
+        responder.sendError(HttpURLConnection.HTTP_BAD_REQUEST, "The url must be specified with url as key in JSON.");
         return;
       }
 
-      String urlParam = Charsets.UTF_8.decode(requestContents).toString();
-
-      Double rank = pageRanks.read(urlParam);
+      // Get the rank from the ranks dataset
+      Double rank = ranks.read(url.getBytes(Charsets.UTF_8));
       if (rank == null) {
-        responder.sendError(HttpResponseStatus.NOT_FOUND.code(), "The following URL was not found: " + urlParam);
-        return;
+        responder.sendError(HttpURLConnection.HTTP_NO_CONTENT, String.format("No rank found of %s", url));
+      } else {
+        responder.sendString(rank.toString());
       }
-
-      responder.sendJson(String.valueOf(rank));
     }
   }
 
@@ -238,7 +240,8 @@ for completion using::
 
 Query for the PageRank results::
 
-  $ cdap-cli.sh call service PageRankApp.PageRankService GET 'pagerank?url=http://example.com/page1'
+  $ cdap-cli.sh call service PageRankApp.PageRankService POST 'pagerank' body '{"url":"http://example.com/page1"}'
+
 
 Example output::
 
