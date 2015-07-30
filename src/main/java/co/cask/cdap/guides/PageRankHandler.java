@@ -44,7 +44,7 @@ public final class PageRankHandler extends AbstractHttpServiceHandler {
 
   @Path(PAGE_RANKS_RANK_HANDLER)
   @POST
-  public void getRank(HttpServiceRequest request, HttpServiceResponder responder) {
+  public void retrieveRank(HttpServiceRequest request, HttpServiceResponder responder) {
     String url = GSON.fromJson(Charsets.UTF_8.decode(request.getContent()).toString(),
                                JsonObject.class).get(URL_KEY).getAsString();
     if (url == null) {
