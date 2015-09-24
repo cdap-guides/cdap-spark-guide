@@ -215,7 +215,8 @@ If you haven't already started a standalone CDAP installation, start it with the
 
 You can then deploy the application to a standalone CDAP installation::
 
-  $ cdap-cli.sh deploy app target/cdap-spark-guide-<version>.jar
+  $ cdap-cli.sh load artifact target/cdap-spark-guide-<version>.jar
+  $ cdap-cli.sh create app PageRankApp cdap-spark-guide <version> user
 
 Start the Service::
 
