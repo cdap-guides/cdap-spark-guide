@@ -138,6 +138,11 @@
       <version>${scala.version}</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-servlet</artifactId>
+      <version>1.18</version>
+    </dependency>
   </dependencies>
 
   <build>
