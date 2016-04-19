@@ -21,10 +21,12 @@ import co.cask.cdap.test.ServiceManager;
 import co.cask.cdap.test.SparkManager;
 import co.cask.cdap.test.StreamManager;
 import co.cask.cdap.test.TestBase;
+import co.cask.cdap.test.TestConfiguration;
 import co.cask.common.http.HttpRequest;
 import co.cask.common.http.HttpRequests;
 import co.cask.common.http.HttpResponse;
 import org.junit.Assert;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import java.net.HttpURLConnection;
@@ -35,6 +37,9 @@ import java.util.concurrent.TimeUnit;
  * Unit test for {@link PageRankApp}
  */
 public class PageRankAppTest extends TestBase {
+
+  @ClassRule
+  public static final TestConfiguration TEST_CONFIG = new TestConfiguration("explore.enabled", false);
 
   private static final String URL_PAIR1 = "http://example.com/page1 http://example.com/page1";
   private static final String URL_PAIR2 = "http://example.com/page1 http://example.com/page10";
