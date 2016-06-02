@@ -82,16 +82,19 @@ and overrides the ``configure()`` method to define all of the application compon
 
   public class PageRankApp extends AbstractApplication {
 
+    public static final String PAGE_RANK_RANKS_SERVICE = "PageRankService";
+    public static final String PAGE_RANK_BACKLINK_STREAM = "backlinkURLStream";
+    public static final String PAGE_RANK_RANKS_DATASET = "pageRanks";
+
     @Override
     public void configure() {
-      setName("PageRankApp");
-      addStream(new Stream("backlinkURLStream"));
       addSpark(new PageRankSpark());
-      addService("PageRankService", new PageRankHandler());
+      addStream(new Stream(PAGE_RANK_BACKLINK_STREAM));
+      addService(PAGE_RANK_RANKS_SERVICE, new PageRankHandler());
       try {
-        ObjectStores.createObjectStore(getConfigurer(), "pageRanks", Double.class);
+        ObjectStores.createObjectStore(getConfigurer(), PAGE_RANK_RANKS_DATASET, Double.class);
       } catch (UnsupportedTypeException e) {
-        throw new RuntimeException("Won't happen: all classes above are supported", e);
+        throw new RuntimeException("Will never happen: all classes above are supported", e);
       }
     }
   }
@@ -135,14 +138,15 @@ Dataset where the key is the URL and the value is the computed PageRank:
 
 .. code:: java
 
-  class PageRankProgram extends ScalaSparkProgram {
+  class PageRankProgram extends SparkMain {
 
     private final val ITERATIONS_COUNT: Int = 10
 
-    override def run(sc: SparkContext) {
-      val lines: RDD[(Array[Byte], Text)] = sc.readFromStream("backlinkURLStream", classOf[Text])
+    override def run(implicit sec: SparkExecutionContext) {
+      val sc = new SparkContext
+      val lines: RDD[String] = sc.fromStream("backlinkURLStream")
       val links = lines.map { s =>
-        val parts = s._2.toString.split("\\s+")
+        val parts = s.split("\\s+")
         (parts(0), parts(1))
       }.distinct().groupByKey().cache()
 
@@ -157,9 +161,7 @@ Dataset where the key is the URL and the value is the computed PageRank:
         ranks = contribs.reduceByKey(_ + _).mapValues(0.15 + 0.85 * _)
       }
 
-      val output = ranks.map(x => (Bytes.toBytes(x._1), x._2))
-
-      sc.writeToDataset(output, "pageRanks", classOf[Array[Byte]], classOf[java.lang.Double])
+      ranks.map(x => (Bytes.toBytes(x._1), x._2)).saveAsDataset("pageRanks")
     }
   }
 
@@ -266,7 +268,7 @@ Have a question? Discuss at the `CDAP User Mailing List <https://groups.google.c
 License
 =======
 
-Copyright © 2014-2015 Cask Data, Inc.
+Copyright © 2014-2016 Cask Data, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may
 not use this file except in compliance with the License. You may obtain
