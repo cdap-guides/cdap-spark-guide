@@ -17,22 +17,22 @@
 package co.cask.cdap.guides
 
 import co.cask.cdap.api.common.Bytes
-import co.cask.cdap.api.spark.{ScalaSparkProgram, SparkContext}
-import org.apache.hadoop.io.Text
-import org.apache.spark.SparkContext._
+import co.cask.cdap.api.spark.{SparkExecutionContext, SparkMain}
+import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
 /**
  * Spark program to compute PageRanks.
  */
-class PageRankProgram extends ScalaSparkProgram {
+class PageRankProgram extends SparkMain {
 
   private final val ITERATIONS_COUNT: Int = 10
 
-  override def run(sc: SparkContext) {
-    val lines: RDD[(Array[Byte], Text)] = sc.readFromStream("backlinkURLStream", classOf[Text])
+  override def run(implicit sec: SparkExecutionContext) {
+    val sc = new SparkContext
+    val lines: RDD[String] = sc.fromStream("backlinkURLStream")
     val links = lines.map { s =>
-      val parts = s._2.toString.split("\\s+")
+      val parts = s.split("\\s+")
       (parts(0), parts(1))
     }.distinct().groupByKey().cache()
 
@@ -47,8 +47,6 @@ class PageRankProgram extends ScalaSparkProgram {
       ranks = contribs.reduceByKey(_ + _).mapValues(0.15 + 0.85 * _)
     }
 
-    val output = ranks.map(x => (Bytes.toBytes(x._1), x._2))
-
-    sc.writeToDataset(output, "pageRanks", classOf[Array[Byte]], classOf[java.lang.Double])
+    ranks.map(x => (Bytes.toBytes(x._1), x._2)).saveAsDataset("pageRanks")
   }
 }
