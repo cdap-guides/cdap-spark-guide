@@ -206,44 +206,44 @@ The ``PageRankApp`` application can be built and packaged using the Apache Maven
 
   $ mvn clean package
 
-Note that the remaining commands assume that the ``cdap-cli.sh`` script is
+Note that the remaining commands assume that the ``cdap`` script is
 available on your PATH. If this is not the case, please add it::
 
   $ export PATH=$PATH:<CDAP home>/bin
 
 If you haven't already started a standalone CDAP installation, start it with the command::
 
-  $ cdap.sh start
+  $ cdap sdk start
 
 You can then deploy the application to a standalone CDAP installation::
 
-  $ cdap-cli.sh load artifact target/cdap-spark-guide-<version>.jar
-  $ cdap-cli.sh create app PageRankApp cdap-spark-guide <version> user
+  $ cdap cli load artifact target/cdap-spark-guide-<version>.jar
+  $ cdap cli create app PageRankApp cdap-spark-guide <version> user
 
 Start the Service::
 
-  $ cdap-cli.sh start service PageRankApp.PageRankService 
+  $ cdap cli start service PageRankApp.PageRankService 
 
 Send some Data to the Stream::
 
-  $ cdap-cli.sh send stream backlinkURLStream \'http://example.com/page1 http://example.com/page1\'
-  $ cdap-cli.sh send stream backlinkURLStream \'http://example.com/page1 http://example.com/page10\'
-  $ cdap-cli.sh send stream backlinkURLStream \'http://example.com/page10 http://example.com/page10\'
-  $ cdap-cli.sh send stream backlinkURLStream \'http://example.com/page10 http://example.com/page100\'
-  $ cdap-cli.sh send stream backlinkURLStream \'http://example.com/page100 http://example.com/page100\'
+  $ cdap cli send stream backlinkURLStream \'http://example.com/page1 http://example.com/page1\'
+  $ cdap cli send stream backlinkURLStream \'http://example.com/page1 http://example.com/page10\'
+  $ cdap cli send stream backlinkURLStream \'http://example.com/page10 http://example.com/page10\'
+  $ cdap cli send stream backlinkURLStream \'http://example.com/page10 http://example.com/page100\'
+  $ cdap cli send stream backlinkURLStream \'http://example.com/page100 http://example.com/page100\'
 
 Run the Spark Program::
 
-  $ cdap-cli.sh start spark PageRankApp.PageRankSpark
+  $ cdap cli start spark PageRankApp.PageRankSpark
 
 The Spark Program can take time to complete. You can check the status
 for completion using::
 
-  $ cdap-cli.sh get spark status PageRankApp.PageRankSpark
+  $ cdap cli get spark status PageRankApp.PageRankSpark
 
 Query for the PageRank results::
 
-  $ cdap-cli.sh call service PageRankApp.PageRankService POST 'pagerank' body '{"url":"http://example.com/page1"}'
+  $ cdap cli call service PageRankApp.PageRankService POST 'pagerank' body '{"url":"http://example.com/page1"}'
 
 
 Example output::
@@ -268,7 +268,7 @@ Have a question? Discuss at the `CDAP User Mailing List <https://groups.google.c
 License
 =======
 
-Copyright © 2014-2016 Cask Data, Inc.
+Copyright © 2014-2017 Cask Data, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may
 not use this file except in compliance with the License. You may obtain
