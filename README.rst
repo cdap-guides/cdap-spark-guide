@@ -9,23 +9,23 @@ you will learn how to run Apache Spark programs with CDAP.
 What You Will Build
 ===================
 
-You will build a 
-`CDAP application <http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/applications.html>`__
+You will build a
+`CDAP application <https://docs.cask.co/cdap/current/en/developers-manual/building-blocks/applications.html>`__
 that exposes a RESTful API to take in web pages’ backlinks information and
 serve out the `PageRank <http://en.wikipedia.org/wiki/PageRank>`__ for the
 known web pages. You will:
 
 - Use a
-  `Stream <http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/streams.html>`__
+  `Stream <https://docs.cask.co/cdap/current/en/developers-manual/building-blocks/streams.html>`__
   as the source of backlinks data;
 - Build a CDAP
-  `Spark <http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/spark-jobs.html>`__
+  `Spark <https://docs.cask.co/cdap/current/en/developers-manual/building-blocks/spark-jobs.html>`__
   program that reads directly from the Stream and computes the PageRank of the web pages;
 - Use a
-  `Dataset <http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/datasets/index.html>`__
+  `Dataset <https://docs.cask.co/cdap/current/en/developers-manual/building-blocks/datasets/index.html>`__
   to store the output of the Spark program; and
 - Build a
-  `Service <http://docs.cdap.io/cdap/current/en/developers-manual/building-blocks/services.html>`__
+  `Service <https://docs.cask.co/cdap/current/en/developers-manual/building-blocks/services.html>`__
   to serve the PageRank computation results over HTTP.
 
 What You Will Need
@@ -33,7 +33,7 @@ What You Will Need
 
 - `JDK 7 or 8 <http://www.oracle.com/technetwork/java/javase/downloads/index.html>`__
 - `Apache Maven 3.1+ <http://maven.apache.org/>`__
-- `CDAP SDK <http://docs.cdap.io/cdap/current/en/developers-manual/getting-started/standalone/index.html>`__
+- `CDAP Local Sandbox <https://docs.cask.co/cdap/current/en/developers-manual/getting-started/local-sandbox/index.html>`__
 
 Let’s Build It!
 ===============
@@ -41,7 +41,7 @@ Let’s Build It!
 The following sections will guide you through building an application from scratch. If you
 are interested in deploying and running the application right away, you can clone its
 source code from this GitHub repository. In that case, feel free to skip the next two
-sections and jump right to the 
+sections and jump right to the
 `Build and Run Application <#build-and-run-application>`__ section.
 
 Application Design
@@ -74,8 +74,8 @@ standard Maven project structure for all of the source code files::
   ./src/main/scala/co/cask/cdap/guides/PageRankProgram.scala
 
 The application is identified by the ``PageRankApp`` class. This class
-extends `AbstractApplication 
-<http://docs.cdap.io/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/app/AbstractApplication.html>`__,
+extends `AbstractApplication
+<https://docs.cask.co/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/app/AbstractApplication.html>`__,
 and overrides the ``configure()`` method to define all of the application components:
 
 .. code:: java
@@ -110,11 +110,11 @@ the Spark program that computes the PageRank of the web pages reads directly fro
 We’ll use Scala to write the Spark program (for an example of using Java, refer to the `CDAP SparkPageRank
 example <http://docs.cask.co/cdap/current/en/examples-manual/examples/spark-page-rank.html>`__).
 You’ll need to add ``scala`` and ``maven-scala-plugin`` as dependencies in
-your Maven `pom.xml 
+your Maven `pom.xml
 <https://github.com/cdap-guides/cdap-spark-guide/blob/develop/pom.xml>`__.
 
 The code below configures Spark in CDAP. This class extends
-`AbstractSpark <http://docs.cdap.io/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/spark/AbstractSpark.html>`__
+`AbstractSpark <https://docs.cask.co/cdap/current/en/reference-manual/javadocs/co/cask/cdap/api/spark/AbstractSpark.html>`__
 and overrides the ``configure()`` method to define all of the components. The
 ``setMainClassName`` method sets the Spark Program class which CDAP will run:
 
@@ -131,7 +131,7 @@ and overrides the ``configure()`` method to define all of the components. The
   }
 
 The ``PageRankProgram`` Spark program does the actual page rank
-computation. This code is taken from the `Apache Spark's PageRank example 
+computation. This code is taken from the `Apache Spark's PageRank example
 <https://github.com/apache/spark/blob/master/examples/src/main/scala/org/apache/spark/examples/SparkPageRank.scala>`__;
 the Spark program stores the computed PageRank in an ObjectStore
 Dataset where the key is the URL and the value is the computed PageRank:
@@ -206,44 +206,44 @@ The ``PageRankApp`` application can be built and packaged using the Apache Maven
 
   $ mvn clean package
 
-Note that the remaining commands assume that the ``cdap-cli.sh`` script is
+Note that the remaining commands assume that the ``cdap.sh`` script is
 available on your PATH. If this is not the case, please add it::
 
   $ export PATH=$PATH:<CDAP home>/bin
 
-If you haven't already started a standalone CDAP installation, start it with the command::
+If you haven't already started a CDAP Local Sandbox installation, start it with the command::
 
-  $ cdap.sh start
+  $ cdap sandbox start
 
-You can then deploy the application to a standalone CDAP installation::
+You can then deploy the application to a CDAP Local Sandbox installation::
 
-  $ cdap-cli.sh load artifact target/cdap-spark-guide-<version>.jar
-  $ cdap-cli.sh create app PageRankApp cdap-spark-guide <version> user
+  $ cdap cli load artifact target/cdap-spark-guide-<version>.jar
+  $ cdap cli create app PageRankApp cdap-spark-guide <version> user
 
 Start the Service::
 
-  $ cdap-cli.sh start service PageRankApp.PageRankService 
+  $ cdap cli start service PageRankApp.PageRankService
 
 Send some Data to the Stream::
 
-  $ cdap-cli.sh send stream backlinkURLStream \'http://example.com/page1 http://example.com/page1\'
-  $ cdap-cli.sh send stream backlinkURLStream \'http://example.com/page1 http://example.com/page10\'
-  $ cdap-cli.sh send stream backlinkURLStream \'http://example.com/page10 http://example.com/page10\'
-  $ cdap-cli.sh send stream backlinkURLStream \'http://example.com/page10 http://example.com/page100\'
-  $ cdap-cli.sh send stream backlinkURLStream \'http://example.com/page100 http://example.com/page100\'
+  $ cdap cli send stream backlinkURLStream \'http://example.com/page1 http://example.com/page1\'
+  $ cdap cli send stream backlinkURLStream \'http://example.com/page1 http://example.com/page10\'
+  $ cdap cli send stream backlinkURLStream \'http://example.com/page10 http://example.com/page10\'
+  $ cdap cli send stream backlinkURLStream \'http://example.com/page10 http://example.com/page100\'
+  $ cdap cli send stream backlinkURLStream \'http://example.com/page100 http://example.com/page100\'
 
 Run the Spark Program::
 
-  $ cdap-cli.sh start spark PageRankApp.PageRankSpark
+  $ cdap cli start spark PageRankApp.PageRankSpark
 
 The Spark Program can take time to complete. You can check the status
 for completion using::
 
-  $ cdap-cli.sh get spark status PageRankApp.PageRankSpark
+  $ cdap cli get spark status PageRankApp.PageRankSpark
 
 Query for the PageRank results::
 
-  $ cdap-cli.sh call service PageRankApp.PageRankService POST 'pagerank' body '{"url":"http://example.com/page1"}'
+  $ cdap cli call service PageRankApp.PageRankService POST 'pagerank' body '{"url":"http://example.com/page1"}'
 
 
 Example output::
@@ -268,7 +268,7 @@ Have a question? Discuss at the `CDAP User Mailing List <https://groups.google.c
 License
 =======
 
-Copyright © 2014-2016 Cask Data, Inc.
+Copyright © 2014-2017 Cask Data, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may
 not use this file except in compliance with the License. You may obtain
